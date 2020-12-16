@@ -7,12 +7,10 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/joho/godotenv"
 )
 
 // Connection gets connection of postgresql database
 func Connection() (db *pgxpool.Pool) {
-	godotenv.Load()
 	poolConfig, err := pgxpool.ParseConfig(os.Getenv("DATABASE_URL"))
 	if err != nil {
 		panic(err)
