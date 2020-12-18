@@ -1,11 +1,11 @@
-package auth
+package dto
 
-type RegisterRequest struct {
+type AuthRegister struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
-type LoginRequest struct {
+type AuthLogin struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }

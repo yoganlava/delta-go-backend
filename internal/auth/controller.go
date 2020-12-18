@@ -1,6 +1,9 @@
 package auth
 
 import (
+	"main/internal/dto"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,15 +19,45 @@ func RegisterRoutes(router *gin.Engine, service AuthService) {
 }
 
 func (con controller) register(c *gin.Context) {
-	var request RegisterRequest
+	var request dto.AuthRegister
 	if err := c.BindJSON(&request); err != nil {
-		c.AbortWithStatus(400)
+		c.AbortWithStatus(500)
 		return
 	}
 
-	c.JSON(200, con.service.Register(request))
+	err := con.service.Register(request)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "success",
+	})
 }
 
 func (con controller) login(c *gin.Context) {
+	var request dto.AuthLogin
+	if err := c.BindJSON(&request); err != nil {
+		c.AbortWithStatus(500)
+		return
+	}
+	user, err := con.service.Login(request)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	} else if user.ID != 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "ユーザー名・Eメールとパスワードの組み合わせのアカウントが見つかりませんでした",
+		})
+		return
+	}
 
+	c.JSON(http.StatusAccepted, gin.H{
+		"user": user,
+	})
 }

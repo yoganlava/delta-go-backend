@@ -4,21 +4,21 @@ import (
 	"context"
 	"errors"
 	"main/db"
-	"main/internal/users"
+	"main/internal/dto"
+	"main/internal/entity"
 	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/georgysavva/scany/pgxscan"
-	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type IAuthService interface {
 	// Register registers the user and returns jwt token
-	Register(user RegisterRequest) string
+	Register(user dto.AuthRegister) string
 	// Login registers the user and returns jwt token
-	Login(user LoginRequest) string
+	Login(user dto.AuthLogin) string
 	CreateToken(id int) string
 	VerifyToken(tokenString string) (int error)
 }
@@ -71,29 +71,27 @@ func VerifyToken(tokenString string) (int, error) {
 	return token.Claims.(*UserClaim).id, nil
 }
 
-func (auth AuthService) Register(request RegisterRequest) gin.H {
+func (auth AuthService) Register(request dto.AuthRegister) error {
 	_, err := auth.pool.Exec(context.Background(), "insert into users (username, password) VALUES ($1, $2)", request.Username, request.Password)
+
 	if err != nil {
-		return gin.H{
-			"error": err.Error(),
-		}
+		return err
 	}
-	return gin.H{
-		"message": "User created",
-	}
+
+	return nil
 }
 
 //Login user
-func (auth AuthService) Login(request LoginRequest) gin.H {
-	var u users.SafeUserEntity
+func (auth AuthService) Login(request dto.AuthLogin) (entity.SafeUser, error) {
+	var u entity.SafeUser
 	// err:= us.pool.QueryRow(context.Background(),).Scan(&u.Id,&u.Password,&u.Username,&u.)
 	err := pgxscan.Get(context.Background(), auth.pool, &u, "select * from users where username = $1 or email = $1", u.Username)
+	if u.ID == 0 {
+		return u, nil
+	}
 	if err != nil {
-		return gin.H{
-			"error": err.Error(),
-		}
+		return u, err
 	}
-	return gin.H{
-		"message": "User logged",
-	}
+	return u, nil
+
 }
