@@ -19,6 +19,7 @@ func Connection() (db *pgxpool.Pool) {
 	poolConfig.MinConns = 3
 	poolConfig.MaxConns = int32(maxConn)
 	poolConfig.MaxConnLifetime = time.Hour
+
 	db, err = pgxpool.ConnectConfig(context.Background(), poolConfig)
 
 	if err != nil {

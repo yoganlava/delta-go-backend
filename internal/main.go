@@ -1,7 +1,7 @@
 package main
 
 import (
-	"main/internal/users"
+	"main/internal/auth"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -10,8 +10,7 @@ import (
 func main() {
 	godotenv.Load()
 	router := gin.Default()
+	auth.RegisterRoutes(router, auth.New())
 
-	users.RegisterRoutes(router, users.New())
-
-	router.Run(":3000")
+	router.Run(":5000")
 }

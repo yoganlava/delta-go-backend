@@ -27,8 +27,8 @@ func New() UserService {
 }
 
 // Register user
-func (us UserService) Register(request RegisterRequest) gin.H {
-	_, err := us.pool.Exec(context.Background(), "insert into users (username, password) VALUES ($1, $2)", request.Username, request.Password)
+func (us UserService) Register(user RegisterRequest) gin.H {
+	_, err := us.pool.Exec(context.Background(), "insert into users (username, password) VALUES ($1, $2)", user.Username, user.Password)
 	if err != nil {
 		return gin.H{
 			"error": err.Error(),
@@ -41,6 +41,15 @@ func (us UserService) Register(request RegisterRequest) gin.H {
 
 //Login user
 func (us UserService) Login(user LoginRequest) gin.H {
+	// var u SafeUserEntity
+	// err:= us.pool.QueryRow(context.Background(),).Scan(&u.Id,&u.Password,&u.Username,&u.)
+	// err := pgxscan.Get(context.Background(), us.pool, &u, "select * from users where username = $1 or email = $1", user.Username)
+	// if err != nil {
+	// 	return gin.H{
+	// 		"error": err.Error(),
+	// 	}
+	// }
+
 	return gin.H{
 		"message": "User logged",
 	}

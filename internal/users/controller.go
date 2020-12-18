@@ -11,8 +11,9 @@ type controller struct {
 // RegisterRoutes register routes
 func RegisterRoutes(router *gin.Engine, service UserService) {
 	c := controller{service}
-	router.POST("/register", c.register)
-	router.POST("/login", c.login)
+	u := router.Group("/users")
+	u.POST("/register", c.register)
+	u.POST("/login", c.login)
 }
 
 func (con controller) register(c *gin.Context) {
