@@ -3,17 +3,15 @@ package users
 import (
 	"context"
 	"main/db"
+	"main/internal/entity"
 
-	"github.com/gin-gonic/gin"
+	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 // IUserService encapsulates logic
 type IUserService interface {
-	// Register registers the user and returns jwt token
-	Register(user RegisterRequest) string
-	// Login registers the user and returns jwt token
-	Login(user LoginRequest) string
+	FetchSelf(id int) (entity.SelfUser, error)
 }
 
 //UserService contains connection
@@ -26,22 +24,13 @@ func New() UserService {
 	return UserService{db.Connection()}
 }
 
-// Register user
-func (us UserService) Register(request RegisterRequest) gin.H {
-	_, err := us.pool.Exec(context.Background(), "insert into users (username, password) VALUES ($1, $2)", request.Username, request.Password)
-	if err != nil {
-		return gin.H{
-			"error": err.Error(),
-		}
-	}
-	return gin.H{
-		"message": "User created",
-	}
-}
+//FetchSelf user
+func (us UserService) FetchSelf(id int) (entity.SelfUser, error) {
+	var u entity.SelfUser
 
-//Login user
-func (us UserService) Login(user LoginRequest) gin.H {
-	return gin.H{
-		"message": "User logged",
+	err := pgxscan.Get(context.Background(), us.pool, &u, "select * from users where id=$1", id)
+	if err != nil {
+		return entity.SelfUser{}, err
 	}
+	return u, nil
 }
