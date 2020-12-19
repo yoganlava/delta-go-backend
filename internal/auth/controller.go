@@ -50,7 +50,7 @@ func (con controller) login(c *gin.Context) {
 			"error": err.Error(),
 		})
 		return
-	} else if user.ID != 0 {
+	} else if user.ID == 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "ユーザー名・Eメールとパスワードの組み合わせのアカウントが見つかりませんでした",
 		})

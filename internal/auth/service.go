@@ -75,7 +75,6 @@ func (auth AuthService) VerifyToken(tokenString string) (int, error) {
 func (auth AuthService) Register(request *dto.AuthRegister) error {
 
 	hashed, err := bcrypt.GenerateFromPassword([]byte(request.Password), 10)
-
 	_, err = auth.pool.Exec(context.Background(), "insert into users (email,username, password,verified,created_at,updated_at,strategy) VALUES ($1, $2,$3,$4,now(),now(),'local')",
 		request.Email, request.Username, string(hashed), false)
 
@@ -90,16 +89,16 @@ func (auth AuthService) Register(request *dto.AuthRegister) error {
 func (auth AuthService) Login(request dto.AuthLogin) (entity.AuthUser, error) {
 	var u = entity.AuthUser{}
 	// err:= us.pool.QueryRow(context.Background(),).Scan(&u.Id,&u.Password,&u.Username,&u.)
-	err := pgxscan.Get(context.Background(), auth.pool, &u, "select * from users where username = $1 or email = $1", u.Username)
+	err := pgxscan.Get(context.Background(), auth.pool, &u, "select id,username,password,email,created_at,gender from users where username = $1 or email = $1", request.Credential)
 	hashedError := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(request.Password))
 	if u.ID == 0 {
-		return u, nil
+		return entity.AuthUser{}, nil
 	}
 	if hashedError != nil {
 		return entity.AuthUser{}, hashedError
 	}
 	if err != nil {
-		return u, err
+		return entity.AuthUser{}, err
 	}
 	return u, nil
 

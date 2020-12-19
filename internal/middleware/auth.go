@@ -10,10 +10,14 @@ import (
 
 func JwtMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		const bearerToken = "Bearer"
+		const bearerToken = "Bearer "
 		authHeader := c.GetHeader("Authorization")
+		if len(authHeader) < 1 {
+			c.AbortWithStatus(http.StatusUnauthorized)
+		}
 		tokenString := authHeader[len(bearerToken):]
 		token, err := auth.New().VerifyToken(tokenString)
+
 		if token != -1 {
 			fmt.Print(token)
 			c.Set("user_id", token)
@@ -24,7 +28,7 @@ func JwtMiddleware() gin.HandlerFunc {
 	}
 }
 
-func OptionalMiddelware() gin.HandlerFunc {
+func OptionalMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if len(authHeader) > 0 {

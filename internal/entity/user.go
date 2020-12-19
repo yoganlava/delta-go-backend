@@ -1,5 +1,7 @@
 package entity
 
+import "time"
+
 //LoginStrategy  enum
 type LoginStrategy string
 
@@ -33,20 +35,20 @@ type User struct {
 	PhoneNumber string        `json:"phone_number"`
 	Gender      GenderType    `json:"gender"`
 	Strategy    LoginStrategy `json:"strategy"`
-	CreatedAt   string        `json:"created_at"`
-	UpdatedAt   string        `json:"updated_at"`
+	CreatedAt   time.Time     `json:"created_at"`
+	UpdatedAt   time.Time     `json:"updated_at"`
 	Verified    bool          `json:"verified"`
 	SocialID    string        `json:"social_id"`
 	Password    string        `json:"password"`
 }
 
 type AuthUser struct {
-	ID        int        `json:"id"`
-	Email     string     `json:"email"`
+	ID        int        `json:"id" db:"id"`
+	Email     string     `json:"email" db:"email"`
 	Username  string     `json:"username"`
 	Password  string     `json:"password"`
 	Gender    GenderType `json:"gender"`
-	CreatedAt string     `json:"created_at"`
+	CreatedAt time.Time  `json:"created_at"`
 }
 
 type SelfUser struct {
@@ -58,7 +60,7 @@ type SelfUser struct {
 	PhoneNumber string        `json:"phone_number"`
 	Gender      GenderType    `json:"gender"`
 	Strategy    LoginStrategy `json:"strategy"`
-	CreatedAt   string        `json:"created_at"`
-	UpdatedAt   string        `json:"updated_at"`
+	CreatedAt   time.Time     `json:"created_at"`
+	UpdatedAt   time.Time     `json:"updated_at"`
 	Verified    bool          `json:"verified"`
 }
