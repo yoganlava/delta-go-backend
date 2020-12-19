@@ -12,6 +12,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type IAuthService interface {
@@ -37,7 +38,7 @@ func New() AuthService {
 }
 
 // CreateToken for user
-func CreateToken(id int) string {
+func (auth AuthService) CreateToken(id int) string {
 	// token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 	// 	"id":  id,
 	// 	"exp": time.Now().Add(time.Minute * 30).Unix(),
@@ -55,7 +56,7 @@ func CreateToken(id int) string {
 }
 
 // VerifyToken and return user id or error
-func VerifyToken(tokenString string) (int, error) {
+func (auth AuthService) VerifyToken(tokenString string) (int, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &UserClaim{}, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("Something went wrong when parsing")
@@ -66,13 +67,17 @@ func VerifyToken(tokenString string) (int, error) {
 		return -1, err
 	}
 	if !token.Valid {
-		return -1, errors.New("Token expired")
+		return -1, errors.New("トークンの期限が切れています")
 	}
 	return token.Claims.(*UserClaim).id, nil
 }
 
-func (auth AuthService) Register(request dto.AuthRegister) error {
-	_, err := auth.pool.Exec(context.Background(), "insert into users (username, password) VALUES ($1, $2)", request.Username, request.Password)
+func (auth AuthService) Register(request *dto.AuthRegister) error {
+
+	hashed, err := bcrypt.GenerateFromPassword([]byte(request.Password), 10)
+
+	_, err = auth.pool.Exec(context.Background(), "insert into users (email,username, password,verified,created_at,updated_at,strategy) VALUES ($1, $2,$3,$4,now(),now(),'local')",
+		request.Email, request.Username, string(hashed), false)
 
 	if err != nil {
 		return err
@@ -82,12 +87,16 @@ func (auth AuthService) Register(request dto.AuthRegister) error {
 }
 
 //Login user
-func (auth AuthService) Login(request dto.AuthLogin) (entity.SafeUser, error) {
-	var u entity.SafeUser
+func (auth AuthService) Login(request dto.AuthLogin) (entity.AuthUser, error) {
+	var u = entity.AuthUser{}
 	// err:= us.pool.QueryRow(context.Background(),).Scan(&u.Id,&u.Password,&u.Username,&u.)
 	err := pgxscan.Get(context.Background(), auth.pool, &u, "select * from users where username = $1 or email = $1", u.Username)
+	hashedError := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(request.Password))
 	if u.ID == 0 {
 		return u, nil
+	}
+	if hashedError != nil {
+		return entity.AuthUser{}, hashedError
 	}
 	if err != nil {
 		return u, err

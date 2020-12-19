@@ -25,7 +25,7 @@ func (con controller) register(c *gin.Context) {
 		return
 	}
 
-	err := con.service.Register(request)
+	err := con.service.Register(&request)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -56,8 +56,8 @@ func (con controller) login(c *gin.Context) {
 		})
 		return
 	}
-
+	jwt := con.service.CreateToken(user.ID)
 	c.JSON(http.StatusAccepted, gin.H{
-		"user": user,
+		"jwt": jwt,
 	})
 }
