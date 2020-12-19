@@ -2,10 +2,13 @@ package auth
 
 import (
 	"errors"
+	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 )
 
 type UserClaim struct {
@@ -47,4 +50,15 @@ func VerifyToken(tokenString string) (int, error) {
 		return -1, errors.New("Token expired")
 	}
 	return token.Claims.(*UserClaim).id, nil
+}
+
+// Middleware is run ever time its group has been requested
+func Middleware(c *gin.Context) {
+	_, err := VerifyToken(strings.Split(c.GetHeader("Authorization"), " ")[1])
+	if err != nil {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	return
 }
