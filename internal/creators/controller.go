@@ -31,6 +31,7 @@ func RegisterRoutes(router *gin.Engine, service CreatorService) {
 }
 
 func (con controller) FetchCreator(c *gin.Context) {
+	// Will change later to accomodate for creators with custom url
 	id, _ := strconv.Atoi(c.Param("id"))
 	userID, exists := c.Get("user_id")
 	var creator entity.Creator
