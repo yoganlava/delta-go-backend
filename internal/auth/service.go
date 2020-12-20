@@ -89,7 +89,7 @@ func (auth AuthService) Register(request *dto.AuthRegister) error {
 func (auth AuthService) Login(request dto.AuthLogin) (entity.AuthUser, error) {
 	var u = entity.AuthUser{}
 	// err:= us.pool.QueryRow(context.Background(),).Scan(&u.Id,&u.Password,&u.Username,&u.)
-	err := pgxscan.Get(context.Background(), auth.pool, &u, "select id,username,password,email,created_at,gender from users where username = $1 or email = $1", request.Credential)
+	err := pgxscan.Get(context.Background(), auth.pool, &u, "select id,username,password,email,created_at,gender,verified from users where username = $1 or email = $1", request.Credential)
 	hashedError := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(request.Password))
 	if u.ID == 0 {
 		return entity.AuthUser{}, nil
@@ -100,6 +100,7 @@ func (auth AuthService) Login(request dto.AuthLogin) (entity.AuthUser, error) {
 	if err != nil {
 		return entity.AuthUser{}, err
 	}
+	u.Password = ""
 	return u, nil
 
 }

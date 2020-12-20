@@ -43,12 +43,17 @@ type User struct {
 }
 
 type AuthUser struct {
-	ID        int        `json:"id" db:"id"`
-	Email     string     `json:"email" db:"email"`
-	Username  string     `json:"username"`
-	Password  string     `json:"password"`
-	Gender    GenderType `json:"gender"`
-	CreatedAt time.Time  `json:"created_at"`
+	ID          int           `json:"id" db:"id"`
+	Email       string        `json:"email" db:"email"`
+	Username    string        `json:"username"`
+	Password    string        `json:"password"`
+	Verified    bool          `json:"verified"`
+	Gender      GenderType    `json:"gender"`
+	CreatedAt   time.Time     `json:"created_at"`
+	Strategy    LoginStrategy `json:"strategy"`
+	FirstName   string        `json:"first_name"`
+	LastName    string        `json:"last_name"`
+	PhoneNumber string        `json:"phone_number"`
 }
 
 type SelfUser struct {
