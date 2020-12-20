@@ -10,6 +10,7 @@ type AuthLogin struct {
 	Credential string `json:"credential" binding:"required"`
 	Password   string `json:"password" binding:"required"`
 }
-type LoginPayload struct {
+type CreateTokenDTO struct {
 	JWT string `json:"jwt"`
+	EXP int64  `json:"exp_at"`
 }

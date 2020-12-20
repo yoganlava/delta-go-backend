@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"main/internal/dto"
 	"net/http"
 
@@ -56,6 +57,7 @@ func (con controller) login(c *gin.Context) {
 		})
 		return
 	}
+	fmt.Print(user)
 	jwt := con.service.CreateToken(user.ID)
 	c.JSON(http.StatusAccepted, gin.H{
 		"user": user,

@@ -20,8 +20,7 @@ func JwtMiddleware() gin.HandlerFunc {
 		// Might want to remove New() everytime we want to verify token as there is no need
 		token, err := auth.New().VerifyToken(tokenString)
 
-		if token != -1 {
-			fmt.Print(token)
+		if token > 0 {
 			c.Set("user_id", token)
 		} else {
 			fmt.Print(err)

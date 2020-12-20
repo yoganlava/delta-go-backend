@@ -28,7 +28,7 @@ func New() UserService {
 func (us UserService) FetchSelf(id int) (entity.SelfUser, error) {
 	var u entity.SelfUser
 
-	err := pgxscan.Get(context.Background(), us.pool, &u, "select * from users where id=$1", id)
+	err := pgxscan.Get(context.Background(), us.pool, &u, "select id,first_name,last_name,phone_number,username,email,created_at,updated_at,gender,strategy,verified from users where id=$1", id)
 	if err != nil {
 		return entity.SelfUser{}, err
 	}

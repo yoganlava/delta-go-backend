@@ -1,6 +1,7 @@
 package users
 
 import (
+	"fmt"
 	"main/internal/middleware"
 	"net/http"
 
@@ -23,6 +24,7 @@ func RegisterRoutes(router *gin.Engine, service UserService) {
 
 func (con controller) fetchSelf(c *gin.Context) {
 	id, exists := c.Get("user_id")
+	fmt.Println(id, exists)
 	if !exists {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
@@ -30,6 +32,7 @@ func (con controller) fetchSelf(c *gin.Context) {
 	// var user entity.SelfUser
 	user, err := con.service.FetchSelf(id.(int))
 	if err != nil {
+		fmt.Print(err)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}

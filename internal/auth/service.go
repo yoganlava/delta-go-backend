@@ -28,9 +28,8 @@ type AuthService struct {
 }
 
 type UserClaim struct {
-	jwt.MapClaims
-	id  int
-	exp int64
+	ID int `json:"id"`
+	jwt.StandardClaims
 }
 
 func New() AuthService {
@@ -38,17 +37,26 @@ func New() AuthService {
 }
 
 // CreateToken for user
-func (auth AuthService) CreateToken(id int) string {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, UserClaim{
-		id:  id,
-		exp: time.Now().Add(time.Minute * 30).Unix(),
-	})
+func (auth AuthService) CreateToken(id int) dto.CreateTokenDTO {
+	now := time.Now()
+	now.Add(time.Hour * 24)
+	var claim = UserClaim{
+		ID: id,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: now.UnixNano(),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
 
 	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
 		panic(err)
 	}
-	return tokenString
+	return dto.CreateTokenDTO{
+		JWT: tokenString,
+		EXP: now.UnixNano(),
+	}
 }
 
 // VerifyToken and return user id or error
@@ -65,7 +73,7 @@ func (auth AuthService) VerifyToken(tokenString string) (int, error) {
 	if !token.Valid {
 		return -1, errors.New("トークンの期限が切れています")
 	}
-	return token.Claims.(*UserClaim).id, nil
+	return token.Claims.(*UserClaim).ID, nil
 }
 
 // Register user

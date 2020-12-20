@@ -16,7 +16,7 @@ func Connection() (db *pgxpool.Pool) {
 		panic(err)
 	}
 	maxConn, err := strconv.ParseInt(os.Getenv("MAX_POOL"), 10, 32)
-	poolConfig.MinConns = 3
+	poolConfig.MinConns = 1
 	poolConfig.MaxConns = int32(maxConn)
 	poolConfig.MaxConnLifetime = time.Hour
 
