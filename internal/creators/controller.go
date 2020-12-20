@@ -75,3 +75,28 @@ func (con controller) CreateCreator(c *gin.Context) {
 		"creator": newCreator,
 	})
 }
+
+func (con controller) UpdateCreator(c *gin.Context) {
+	var creator dto.UpdateCreatorDTO
+	if err := c.BindJSON(&creator); err != nil {
+		c.AbortWithStatus(500)
+		return
+	}
+
+	id, exists := c.Get("user_id")
+	creator.UserID = id.(int)
+
+	if !exists {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+	newCreator, err := con.service.UpdateCreator(creator)
+	if err != nil || newCreator.ID == 0 {
+		c.AbortWithStatus(http.StatusUnprocessableEntity)
+		return
+	}
+
+	c.JSON(http.StatusNoContent, gin.H{
+		"message": "Successfully Updated",
+	})
+}

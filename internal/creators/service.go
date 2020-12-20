@@ -2,6 +2,7 @@ package creators
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"main/db"
 	"main/internal/dto"
@@ -54,12 +55,42 @@ func (cs CreatorService) CreateCreator(c dto.CreateCreatorDTO) (entity.Creator, 
 		if err != nil {
 			fmt.Println(err.Error())
 		}
-
 	}()
 	if err != nil {
 		fmt.Print(err.Error())
 		return entity.Creator{}, err
 	}
-	fmt.Println("Ended")
+	return creator, nil
+}
+
+func (cs CreatorService) UpdateCreator(c dto.UpdateCreatorDTO) (entity.Creator, error) {
+	var creator entity.Creator
+
+	trans, err := cs.pool.Begin(context.Background())
+
+	if err != nil {
+		trans.Rollback(context.Background())
+		return entity.Creator{}, err
+	}
+	var userID int
+	trans.QueryRow(context.Background(), `select user_id from creator where id = $1`, c.ID).Scan(&userID)
+	if userID != c.UserID {
+		trans.Rollback(context.Background())
+		return entity.Creator{}, errors.New("このクリエーターを更新する権限がありません")
+	}
+	_, err = trans.Exec(context.Background(), `
+	update creator
+	set name = $1,bio = $2, avatar_image_id=$3,creator_rank_id=$4
+	where id = $5 and user_id = $6
+	`, c.Name, c.Bio, c.AvatarImageID, c.CreatorRankID, c.ID, c.UserID)
+
+	if err != nil {
+		trans.Rollback(context.Background())
+		return entity.Creator{}, err
+	}
+	if err != nil {
+		fmt.Print(err.Error())
+		return entity.Creator{}, err
+	}
 	return creator, nil
 }
