@@ -19,19 +19,7 @@ func RegisterRoutes(router *gin.Engine, service UserService) {
 	{
 		u.GET("/me", c.fetchSelf)
 	}
-
-	// u.POST("/login", c.login)
 }
-
-// func (con controller) register(c *gin.Context) {
-// 	var request RegisterRequest
-// 	if err := c.BindJSON(&request); err != nil {
-// 		c.AbortWithStatus(400)
-// 		return
-// 	}
-
-// 	c.JSON(200, con.service.Register(request))
-// }
 
 func (con controller) fetchSelf(c *gin.Context) {
 	id, exists := c.Get("user_id")
@@ -48,5 +36,4 @@ func (con controller) fetchSelf(c *gin.Context) {
 	c.JSON(http.StatusAccepted, gin.H{
 		"user": user,
 	})
-	return
 }

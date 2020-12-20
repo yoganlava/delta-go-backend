@@ -39,10 +39,6 @@ func New() AuthService {
 
 // CreateToken for user
 func (auth AuthService) CreateToken(id int) string {
-	// token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-	// 	"id":  id,
-	// 	"exp": time.Now().Add(time.Minute * 30).Unix(),
-	// })
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, UserClaim{
 		id:  id,
 		exp: time.Now().Add(time.Minute * 30).Unix(),
@@ -72,8 +68,8 @@ func (auth AuthService) VerifyToken(tokenString string) (int, error) {
 	return token.Claims.(*UserClaim).id, nil
 }
 
+// Register user
 func (auth AuthService) Register(request *dto.AuthRegister) error {
-
 	hashed, err := bcrypt.GenerateFromPassword([]byte(request.Password), 10)
 	_, err = auth.pool.Exec(context.Background(), "insert into users (email,username, password,verified,created_at,updated_at,strategy) VALUES ($1, $2,$3,$4,now(),now(),'local')",
 		request.Email, request.Username, string(hashed), false)
@@ -102,5 +98,4 @@ func (auth AuthService) Login(request dto.AuthLogin) (entity.AuthUser, error) {
 	}
 	u.Password = ""
 	return u, nil
-
 }
