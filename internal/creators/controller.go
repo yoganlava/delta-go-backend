@@ -3,6 +3,7 @@ package creators
 import (
 	"fmt"
 	"main/internal/dto"
+	"main/internal/entity"
 	"main/internal/middleware"
 	"net/http"
 	"strconv"
@@ -32,9 +33,15 @@ func RegisterRoutes(router *gin.Engine, service CreatorService) {
 func (con controller) FetchCreator(c *gin.Context) {
 	// Will change later to accomodate for creators with custom url
 	id, _ := strconv.Atoi(c.Param("id"))
-	user_id, _ := c.Get("user_id")
+	userID, exists := c.Get("user_id")
+	var creator entity.Creator
+	var err error
+	if exists {
+		creator, err = con.service.FetchCreator(id, userID.(int))
+	} else {
+		creator, err = con.service.FetchCreator(id, 0)
+	}
 
-	creator, err := con.service.FetchCreator(id, user_id.(int))
 	if err != nil {
 		fmt.Print(err)
 		c.JSON(http.StatusAccepted, gin.H{
