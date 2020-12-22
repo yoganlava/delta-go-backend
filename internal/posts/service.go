@@ -17,7 +17,7 @@ type IPostService interface {
 	FetchCreatorPosts(id int) (entity.Post, error)
 }
 
-// New create new User Service
+// New create new Post Service
 func New() PostService {
 	return PostService{db.Connection()}
 }
