@@ -15,6 +15,7 @@ func JwtMiddleware() gin.HandlerFunc {
 		authHeader := c.GetHeader("Authorization")
 		if len(authHeader) < 1 {
 			c.AbortWithStatus(http.StatusUnauthorized)
+			return
 		}
 		tokenString := authHeader[len(bearerToken):]
 		// Might want to remove New() everytime we want to verify token as there is no need

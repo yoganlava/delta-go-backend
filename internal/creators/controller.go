@@ -1,7 +1,6 @@
 package creators
 
 import (
-	"fmt"
 	"main/internal/dto"
 	"main/internal/entity"
 	"main/internal/middleware"
@@ -41,9 +40,7 @@ func (con controller) FetchCreator(c *gin.Context) {
 	} else {
 		creator, err = con.service.FetchCreator(id, 0)
 	}
-
 	if err != nil {
-		fmt.Print(err)
 		c.JSON(http.StatusAccepted, gin.H{
 			"error": "作成者が見つかりません",
 		})
