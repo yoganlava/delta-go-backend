@@ -88,6 +88,7 @@ func (cs CreatorService) UpdateCreator(c dto.UpdateCreatorDTO) (entity.Creator, 
 		trans.Rollback(context.Background())
 		return entity.Creator{}, err
 	}
+	trans.Commit(context.Background())
 	if err != nil {
 		fmt.Print(err.Error())
 		return entity.Creator{}, err
