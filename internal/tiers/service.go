@@ -2,6 +2,7 @@ package tiers
 
 import (
 	"context"
+	"main/db"
 	"main/internal/dto"
 	"main/internal/entity"
 
@@ -17,6 +18,10 @@ type ITierService interface {
 	CreateTier(t dto.CreateTierDTO) error
 	FetchProjectTiers(id int) ([]*entity.Tier, error)
 	FetchTier(id int) (entity.Tier, error)
+}
+
+func New() TierService {
+	return TierService{db.Connection()}
 }
 
 func (ts TierService) CreateTier(t dto.CreateTierDTO) error {
