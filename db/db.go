@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strconv"
 	"time"
@@ -23,6 +24,7 @@ func Connection() (db *pgxpool.Pool) {
 	db, err = pgxpool.ConnectConfig(context.Background(), poolConfig)
 
 	if err != nil {
+		fmt.Print(err)
 		panic(err)
 	}
 

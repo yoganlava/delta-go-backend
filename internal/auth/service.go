@@ -79,6 +79,14 @@ func (auth AuthService) VerifyToken(tokenString string) (int, error) {
 // Register user
 func (auth AuthService) Register(request *dto.AuthRegister) error {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(request.Password), 10)
+	var user entity.User
+	pgxscan.Get(context.Background(), auth.pool, &user, `
+	select * from users where lower(email) = $1 or lower(username) = $2
+	`, request.Email, request.Username)
+
+	if user.ID > 0 {
+		return errors.New("ユーザー名またはEメールがもう使われています")
+	}
 	_, err = auth.pool.Exec(context.Background(), "insert into users (email,username, password,verified,created_at,updated_at,strategy) VALUES ($1, $2,$3,$4,now(),now(),'local')",
 		request.Email, request.Username, string(hashed), false)
 
@@ -93,7 +101,13 @@ func (auth AuthService) Register(request *dto.AuthRegister) error {
 func (auth AuthService) Login(request dto.AuthLogin) (entity.AuthUser, error) {
 	var u = entity.AuthUser{}
 	// err:= us.pool.QueryRow(context.Background(),).Scan(&u.Id,&u.Password,&u.Username,&u.)
-	err := pgxscan.Get(context.Background(), auth.pool, &u, "select id,username,password,email,created_at,gender,verified from users where username = $1 or email = $1", request.Credential)
+	err := pgxscan.Get(context.Background(), auth.pool, &u, `
+	select 
+	u.id,u.username,u.password,u.email,u.created_at,u.gender,u.verified,
+	f.location as avatar
+	from users u
+	inner join file f on f.id = u.avatar_image_id
+	where u.username = $1 or u.email = $1`, request.Credential)
 	hashedError := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(request.Password))
 	if u.ID == 0 {
 		return entity.AuthUser{}, nil
