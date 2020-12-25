@@ -15,7 +15,8 @@ type TierService struct {
 
 type ITierService interface {
 	CreateTier(t dto.CreateTierDTO) error
-	FetchProjectTiers(id int) error
+	FetchProjectTiers(id int) ([]*entity.Tier, error)
+	FetchTier(id int) (entity.Tier, error)
 }
 
 func (ts TierService) CreateTier(t dto.CreateTierDTO) error {
