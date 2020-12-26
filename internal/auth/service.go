@@ -77,7 +77,7 @@ func (auth AuthService) VerifyToken(tokenString string) (int, error) {
 }
 
 // Register user
-func (auth AuthService) Register(request *dto.AuthRegister) error {
+func (auth AuthService) Register(request *dto.AuthRegister) (entity.User, error) {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(request.Password), 10)
 	var user entity.User
 	pgxscan.Get(context.Background(), auth.pool, &user, `
@@ -85,16 +85,16 @@ func (auth AuthService) Register(request *dto.AuthRegister) error {
 	`, request.Email, request.Username)
 
 	if user.ID > 0 {
-		return errors.New("ユーザー名またはEメールがもう使われています")
+		return entity.User{}, errors.New("ユーザー名またはEメールがもう使われています")
 	}
-	_, err = auth.pool.Exec(context.Background(), "insert into users (email,username, password,verified,created_at,updated_at,strategy) VALUES ($1, $2,$3,$4,now(),now(),'local')",
+	err = pgxscan.Get(context.Background(), auth.pool, &user, "insert into users (email,username, password,verified,created_at,updated_at,strategy) VALUES ($1, $2,$3,$4,now(),now(),'local') returning id,username,password,verified,created_at",
 		request.Email, request.Username, string(hashed), false)
 
 	if err != nil {
-		return err
+		return entity.User{}, err
 	}
 
-	return nil
+	return user, nil
 }
 
 //Login user

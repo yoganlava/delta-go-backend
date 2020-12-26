@@ -22,20 +22,24 @@ func RegisterRoutes(router *gin.Engine, service AuthService) {
 func (con controller) register(c *gin.Context) {
 	var request dto.AuthRegister
 	if err := c.BindJSON(&request); err != nil {
-		c.AbortWithStatus(500)
-		return
-	}
-
-	err := con.service.Register(&request)
-	if err != nil {
+		fmt.Print(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
+	user, err := con.service.Register(&request)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	jwt := con.service.CreateToken(user.ID)
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "success",
+		"user": user,
+		"jwt":  jwt,
 	})
 }
 

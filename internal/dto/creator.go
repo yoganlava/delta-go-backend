@@ -15,3 +15,8 @@ type UpdateCreatorDTO struct {
 	CreatorRankID int     `json:"creator_rank_id"`
 	UserID        int     `json:"user_id"`
 }
+
+type SearchCreatorDTO struct {
+	Query string `json:"query"`
+	*PaginationDTO
+}
