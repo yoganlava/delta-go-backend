@@ -22,7 +22,7 @@ func RegisterRoutes(router *gin.Engine, service AuthService) {
 func (con controller) register(c *gin.Context) {
 	var request dto.AuthRegister
 	if err := c.BindJSON(&request); err != nil {
-		fmt.Print(err.Error())
+		// fmt.Print(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
