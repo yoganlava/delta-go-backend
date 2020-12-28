@@ -10,6 +10,7 @@ import (
 
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/vmihailenco/msgpack/v5"
 )
 
 type ICreatorService interface {
@@ -27,7 +28,16 @@ type CreatorService struct {
 
 func (cs CreatorService) FetchCreator(id int, user_id int) (entity.Creator, error) {
 	var c entity.Creator
-	err := pgxscan.Get(context.Background(), cs.pool, &c, `
+
+	val, err := db.Cache().Get(context.Background(), fmt.Sprintf(`/creators/%v`, id)).Result()
+	err = msgpack.Unmarshal([]byte(val), &c)
+	if c.ID > 0 {
+		if c.UserID != user_id {
+			c.CreatorRank = entity.CreatorRank{}
+		}
+		return c, nil
+	}
+	err = pgxscan.Get(context.Background(), cs.pool, &c, `
 	 select c.id,c.name,c.avatar_image_id,
 	 c.user_id,c.updated_at,c.created_at, 
 	 JSON_BUILD_OBJECT('bio',cp.bio) as creator_profile,
@@ -44,8 +54,13 @@ func (cs CreatorService) FetchCreator(id int, user_id int) (entity.Creator, erro
 	if c.UserID != user_id {
 		c.CreatorRank = entity.CreatorRank{}
 	}
+	marsh, err := msgpack.Marshal(&c)
+
+	go db.Cache().Set(context.Background(), fmt.Sprintf(`/creators/%v`, id), marsh, 0)
 	return c, nil
 }
+
+func (cs CreatorService) SearchCreator() {}
 
 func (cs CreatorService) CreateCreator(c dto.CreateCreatorDTO) (entity.Creator, error) {
 	var creator entity.Creator
