@@ -3,10 +3,13 @@ package auth
 import (
 	"context"
 	"errors"
+	"fmt"
 	"main/db"
 	"main/internal/dto"
 	"main/internal/entity"
+	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -20,8 +23,8 @@ type IAuthService interface {
 	Register(user dto.AuthRegister) string
 	// Login registers the user and returns jwt token
 	Login(user dto.AuthLogin) string
-	CreateToken(id int) string
-	VerifyToken(tokenString string) (int error)
+	// CreateToken(id int) string
+	// VerifyToken(tokenString string) (int error)
 }
 type AuthService struct {
 	pool *pgxpool.Pool
@@ -37,7 +40,7 @@ func New() AuthService {
 }
 
 // CreateToken for user
-func (auth AuthService) CreateToken(id int) dto.CreateTokenDTO {
+func CreateToken(id int) dto.CreateTokenDTO {
 	now := time.Now()
 	now.Add(time.Hour * 24)
 	var claim = UserClaim{
@@ -60,7 +63,7 @@ func (auth AuthService) CreateToken(id int) dto.CreateTokenDTO {
 }
 
 // VerifyToken and return user id or error
-func (auth AuthService) VerifyToken(tokenString string) (int, error) {
+func VerifyToken(tokenString string) (int, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &UserClaim{}, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("Something went wrong when parsing")
@@ -94,6 +97,8 @@ func (auth AuthService) Register(request *dto.AuthRegister) (entity.User, error)
 		return entity.User{}, err
 	}
 
+	sendVerificationEmail(request.Email, request.Username, user.ID)
+
 	return user, nil
 }
 
@@ -120,4 +125,19 @@ func (auth AuthService) Login(request dto.AuthLogin) (entity.AuthUser, error) {
 	}
 	u.Password = ""
 	return u, nil
+}
+
+// Rudimentary
+func sendVerificationEmail(email string, username string, id int) {
+	emailHTML := fmt.Sprintf(
+		`<h1>Welcome $1</h1>
+	<a href='http://onjin.jp/verify/$2'>Click me</a>
+	`, username, CreateToken(id))
+	payload := strings.NewReader(fmt.Sprintf("{\"sender\":{\"name\":\"Onjin\",\"email\":\"noreply@onjin.jp\",\"id\":-2},\"to\":[{\"email\":\"$1\",\"name\":\"$2\"}],\"htmlContent\":\"$3\"}", email, username, emailHTML))
+	req, _ := http.NewRequest("POST", "https://api.sendinblue.com/v3/smtp/email", payload)
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("api-key", os.Getenv("EMAIL_API_KEY"))
+
+	http.DefaultClient.Do(req)
 }

@@ -26,4 +26,5 @@ func (con controller) uploadFile(c *gin.Context) {
 	}
 
 	//Do stuff with file
+	println(file)
 }

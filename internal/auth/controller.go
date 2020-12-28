@@ -36,7 +36,7 @@ func (con controller) register(c *gin.Context) {
 		})
 		return
 	}
-	jwt := con.service.CreateToken(user.ID)
+	jwt := CreateToken(user.ID)
 	c.JSON(http.StatusCreated, gin.H{
 		"user": user,
 		"jwt":  jwt,
@@ -62,7 +62,7 @@ func (con controller) login(c *gin.Context) {
 		return
 	}
 	fmt.Print(user)
-	jwt := con.service.CreateToken(user.ID)
+	jwt := CreateToken(user.ID)
 	c.JSON(http.StatusAccepted, gin.H{
 		"user": user,
 		"jwt":  jwt,
