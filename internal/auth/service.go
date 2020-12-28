@@ -130,8 +130,8 @@ func (auth AuthService) Login(request dto.AuthLogin) (entity.AuthUser, error) {
 // Rudimentary
 func sendVerificationEmail(email string, username string, id int) {
 	emailHTML := fmt.Sprintf(
-		`<h1>Welcome $1</h1>
-	<a href='http://onjin.jp/verify/$2'>Click me</a>
+		`<h1>Welcome %v</h1>
+	<a href='http://onjin.jp/verify/%v'>Click me</a>
 	`, username, CreateToken(id))
 	payload := strings.NewReader(fmt.Sprintf("{\"sender\":{\"name\":\"Onjin\",\"email\":\"noreply@onjin.jp\",\"id\":-2},\"to\":[{\"email\":\"$1\",\"name\":\"$2\"}],\"htmlContent\":\"$3\"}", email, username, emailHTML))
 	req, _ := http.NewRequest("POST", "https://api.sendinblue.com/v3/smtp/email", payload)
