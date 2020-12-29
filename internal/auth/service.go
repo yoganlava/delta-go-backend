@@ -3,13 +3,11 @@ package auth
 import (
 	"context"
 	"errors"
-	"fmt"
 	"main/db"
 	"main/internal/dto"
+	"main/internal/email"
 	"main/internal/entity"
-	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -74,6 +72,7 @@ func VerifyToken(tokenString string) (int, error) {
 		return -1, err
 	}
 	if !token.Valid {
+		//Expired token
 		return -1, errors.New("トークンの期限が切れています")
 	}
 	return token.Claims.(*UserClaim).ID, nil
@@ -96,9 +95,9 @@ func (auth AuthService) Register(request *dto.AuthRegister) (entity.User, error)
 	if err != nil {
 		return entity.User{}, err
 	}
-
-	sendVerificationEmail(request.Email, request.Username, user.ID)
-
+	token := CreateToken(user.ID)
+	email.SendVerificationEmail(request.Email, request.Username, token.JWT)
+	// email.sendVerificationEmail()
 	return user, nil
 }
 
@@ -128,16 +127,16 @@ func (auth AuthService) Login(request dto.AuthLogin) (entity.AuthUser, error) {
 }
 
 // Rudimentary
-func sendVerificationEmail(email string, username string, id int) {
-	emailHTML := fmt.Sprintf(
-		`<h1>Welcome %v</h1>
-	<a href='http://onjin.jp/verify/%v'>Click me</a>
-	`, username, CreateToken(id))
-	payload := strings.NewReader(fmt.Sprintf("{\"sender\":{\"name\":\"Onjin\",\"email\":\"noreply@onjin.jp\",\"id\":-2},\"to\":[{\"email\":\"$1\",\"name\":\"$2\"}],\"htmlContent\":\"$3\"}", email, username, emailHTML))
-	req, _ := http.NewRequest("POST", "https://api.sendinblue.com/v3/smtp/email", payload)
-	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("api-key", os.Getenv("EMAIL_API_KEY"))
+// func (auth AuthService) sendVerificationEmail(user_id int) error {
+// 	var u = entity.AuthUser{}
+// 	err := pgxscan.Get(context.Background(), auth.pool, &u, `
+// 	select
+// 	u.id,u.username,u.password,u.email,u.created_at,u.gender,u.verified
+// 	from users u
+// 	where u.id = $1`, user_id)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	token := CreateToken(u.ID)
 
-	http.DefaultClient.Do(req)
-}
+// }

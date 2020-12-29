@@ -15,3 +15,8 @@ type CreateTokenDTO struct {
 	JWT string `json:"jwt"`
 	EXP int64  `json:"exp_at"`
 }
+
+// type AuthVerificationDTO struct{
+// 	Username string `json:`
+// 	Email string
+// }
