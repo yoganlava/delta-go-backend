@@ -19,7 +19,7 @@ func JwtMiddleware() gin.HandlerFunc {
 		}
 		tokenString := authHeader[len(bearerToken):]
 		// Might want to remove New() everytime we want to verify token as there is no need
-		token, err := auth.New().VerifyToken(tokenString)
+		token, err := auth.VerifyToken(tokenString)
 
 		if token > 0 {
 			c.Set("user_id", token)
@@ -37,7 +37,7 @@ func OptionalMiddleware() gin.HandlerFunc {
 		if len(authHeader) > 0 {
 			tokenString := authHeader[len("Bearer"):]
 			// Might want to remove New() everytime we want to verify token as there is no need
-			token, err := auth.New().VerifyToken(tokenString)
+			token, err := auth.VerifyToken(tokenString)
 			if err != nil {
 				fmt.Print(err.Error())
 			} else {
