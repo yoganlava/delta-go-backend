@@ -46,7 +46,9 @@ func (con controller) register(c *gin.Context) {
 func (con controller) login(c *gin.Context) {
 	var request dto.AuthLogin
 	if err := c.BindJSON(&request); err != nil {
-		c.AbortWithStatus(500)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 	user, err := con.service.Login(request)
