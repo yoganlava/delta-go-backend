@@ -24,7 +24,6 @@ func RegisterRoutes(router *gin.Engine, service UserService) {
 
 func (con controller) fetchSelf(c *gin.Context) {
 	id, exists := c.Get("user_id")
-	fmt.Println(id, exists)
 	if !exists {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return

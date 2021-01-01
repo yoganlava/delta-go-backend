@@ -1,6 +1,7 @@
 package tiers
 
 import (
+	"main/internal/utility"
 	"net/http"
 	"strconv"
 
@@ -22,20 +23,22 @@ func RegisterRoutes(router *gin.Engine, service TierService) {
 }
 
 func (con controller) fetchProjectTiers(c *gin.Context) {
+	var err error
+	defer utility.ErrorHandleHTTP(c, err)
 	id, _ := strconv.Atoi(c.Param("id"))
 	tiers, err := con.service.FetchProjectTiers(id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 	c.JSON(http.StatusOK, tiers)
 }
 
 func (con controller) fetchTier(c *gin.Context) {
+	var err error
+	defer utility.ErrorHandleHTTP(c, err)
 	id, _ := strconv.Atoi(c.Param("id"))
 	tiers, err := con.service.FetchTier(id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 	c.JSON(http.StatusOK, tiers)
