@@ -42,9 +42,13 @@ func (cs CreatorService) FetchCreator(id int, user_id int) (entity.Creator, erro
 	 c.user_id,c.updated_at,c.created_at, 
 	 JSON_BUILD_OBJECT('bio',cp.bio) as creator_profile,
 	 JSON_BUILD_OBJECT('name',cr.name,'fee',cr.fee) as creator_rank
+	 JSON_AGG(JSON_BUILD_OBJECT('name',p.name,'page_url',p.page_url,'id',p.id,'avatar',f.location,'banner',banner.location)) as projects
 	 from creator c
 	 inner join creator_rank cr on cr.id = c.creator_rank_id
 	 inner join creator_profile cp on cp.creator_id = c.id
+	 inner join project p on p.creator_id = c.id
+	 inner join file f on f.id = p.avatar_image_id 
+	 inner join file banner on banner.id = p.banner_image_id
 	 where c.id = $1
 	 group by c.id,cp.creator_id,cr.id`, id)
 	if err != nil {

@@ -6,6 +6,7 @@ import (
 	"main/db"
 	"main/internal/dto"
 	"main/internal/entity"
+	"strings"
 
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -40,6 +41,22 @@ func (ps ProjectService) CreateProject(p dto.CreateProjectDTO) error {
 		return err
 	}
 	return nil
+}
+
+func (ps ProjectService) isPageURLAvailable(url string) (bool, error) {
+	for _, page := range NotAllowedURL {
+		lowerd_url := strings.ToLower(url)
+		if page == lowerd_url {
+			return false, nil
+		}
+	}
+	var project entity.Project
+	err := pgxscan.Get(context.Background(), ps.pool, &project, `select id from project where lower(page_url) = lower($1)`, url)
+	if err != nil {
+		return false, err
+	}
+
+	return project.ID < 1, nil
 }
 
 //! Temporary, does not belong here
