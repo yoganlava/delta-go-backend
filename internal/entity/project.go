@@ -22,3 +22,9 @@ type ProjectSetting struct {
 	ShowTopSupporter bool `json:"show_top_supporter"`
 	AnyOneCanComment bool `json:"anyone_can_comment"`
 }
+
+type CreatorProject struct {
+	ID      int    `json:"id"`
+	Name    string `json:"name"`
+	PageURL string `json:"page_url"`
+}

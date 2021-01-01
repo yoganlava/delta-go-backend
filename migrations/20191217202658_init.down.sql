@@ -1,57 +1,69 @@
--- DROP TABLE album;
-DROP TABLE payout_transaction;
+-- drop table if exists album;
+DROP TABLE IF EXISTS payout_transaction;
 
-DROP TABLE subscription_transaction;
+DROP TABLE IF EXISTS subscription_transaction;
 
-DROP TABLE donation_transaction;
+DROP TABLE IF EXISTS donation_transaction;
 
-DROP TABLE user_profile;
+DROP TABLE IF EXISTS user_profile;
 
-DROP TABLE post_vote;
+DROP TABLE IF EXISTS post_vote;
 
-DROP TABLE post_text;
+DROP TABLE IF EXISTS post_text;
 
-DROP TABLE post_tag;
+DROP TABLE IF EXISTS post_tag;
 
-DROP TABLE post_poll_answer;
+DROP TABLE IF EXISTS post_poll_answer;
 
-DROP TABLE post_poll_option;
+DROP TABLE IF EXISTS post_poll_option;
 
-DROP TABLE post_file;
+DROP TABLE IF EXISTS post_file;
 
-DROP TABLE post_link;
+DROP TABLE IF EXISTS post_link;
 
-DROP TABLE stripe_card_payment_method;
+DROP TABLE IF EXISTS stripe_card_payment_method;
 
-DROP TABLE stripe_bank_payment_method;
+DROP TABLE IF EXISTS stripe_bank_payment_method;
 
-DROP TABLE tier_benefit;
+DROP TABLE IF EXISTS tier_benefit;
 
-DROP TABLE comment_vote;
+DROP TABLE IF EXISTS comment_vote;
 
-DROP TABLE creator_access;
+DROP TABLE IF EXISTS creator_access;
 
-DROP TABLE payout_method;
+DROP TABLE IF EXISTS payout_method;
 
-DROP TABLE payment_method;
+DROP TABLE IF EXISTS payment_method;
 
-DROP TABLE benefit;
+DROP TABLE IF EXISTS benefit;
 
-DROP TABLE goal;
+DROP TABLE IF EXISTS goal;
 
-DROP TABLE TRANSACTION;
+DROP TABLE IF EXISTS transaction;
 
-DROP TABLE subscription;
+DROP TABLE IF EXISTS subscription;
 
-DROP TABLE comment;
+DROP TABLE IF EXISTS comment;
 
-DROP TABLE post;
+DROP TABLE IF EXISTS post;
 
-DROP TABLE access;
+DROP TABLE IF EXISTS access;
 
-DROP TABLE project;
+DROP TABLE IF EXISTS project;
 
-DROP TABLE creator;
+DROP TABLE IF EXISTS creator;
 
-DROP TABLE users;
+DROP TABLE IF EXISTS users;
+
+DROP TYPE IF EXISTS gender_type;
+
+DROP TYPE IF EXISTS login_strategy;
+
+DROP TYPE IF EXISTS post_type;
+
+DROP TYPE IF EXISTS goal_type;
+
+DROP TYPE IF EXISTS benefit_period;
+
+DROP TYPE IF EXISTS card_brand_type;
 
