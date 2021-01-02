@@ -6,6 +6,7 @@ import (
 	"main/db"
 	"main/internal/dto"
 	"main/internal/entity"
+	"regexp"
 	"strings"
 
 	"github.com/georgysavva/scany/pgxscan"
@@ -26,7 +27,7 @@ type IProjectService interface {
 	FetchProject(id int) (entity.Project, error)
 }
 
-func (ps ProjectService) FetchProject(id int) (entity.Project, error) {
+func (ps ProjectService) FetchProject(url string) (entity.Project, error) {
 	var p entity.Project
 	err := pgxscan.Get(context.Background(), ps.pool, &p, "select id, name, page_url, description, creating, banner_image_id, cover_image_id, creator_id, cover_id, category_id, setting, created_at, updated_at")
 	if err != nil {
@@ -50,13 +51,22 @@ func (ps ProjectService) isPageURLAvailable(url string) (bool, error) {
 			return false, nil
 		}
 	}
+	matched, _ := regexp.MatchString("^[a-zA-Z0-9\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]*$", url)
+	if !matched {
+		return false, errors.New("許されていない文字が入っています。")
+	}
+	if len(url) > 16 {
+		return false, errors.New("URLは16文字以下でお願いします。")
+	}
 	var project entity.Project
 	err := pgxscan.Get(context.Background(), ps.pool, &project, `select id from project where lower(page_url) = lower($1)`, url)
 	if err != nil {
 		return false, err
 	}
-
-	return project.ID < 1, nil
+	if project.ID > 0 {
+		return false, errors.New("このURLはもう使われています。")
+	}
+	return true, nil
 }
 
 //! Temporary, does not belong here

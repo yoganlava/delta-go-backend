@@ -18,7 +18,7 @@ func RegisterRoutes(router *gin.Engine, service UserService) {
 	u := router.Group("/users")
 	u.Use(middleware.JwtMiddleware())
 	{
-		u.GET("/me", c.fetchSelf)
+		u.GET("/self", c.fetchSelf)
 	}
 }
 

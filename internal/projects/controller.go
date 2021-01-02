@@ -4,7 +4,6 @@ import (
 	"main/internal/dto"
 	"main/internal/middleware"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,18 +17,20 @@ func RegisterRoutes(router *gin.Engine, service ProjectService) {
 	r := router.Group("/projects")
 	r.Use(middleware.OptionalMiddleware())
 	{
-		r.GET("/:id", c.FetchProject)
+		r.GET("/:url", c.FetchProject)
 	}
+
 	r.Use(middleware.JwtMiddleware())
 	{
 		r.POST("/", c.CreateProject)
+		r.GET("/:url/isAvailable", c.FetchIsURLAvailable)
 	}
 }
 
 func (con controller) FetchProject(c *gin.Context) {
 	// Will change later to accomodate for projects with custom url
-	id, _ := strconv.Atoi(c.Param("id"))
-	project, err := con.service.FetchProject(id)
+	// id, _ := strconv.Atoi()
+	project, err := con.service.FetchProject(c.Param("url"))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": "プロジェクトが見つかりません",
@@ -37,6 +38,23 @@ func (con controller) FetchProject(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusAccepted, project)
+}
+
+func (con controller) FetchIsURLAvailable(c *gin.Context) {
+	available, err := con.service.isPageURLAvailable(c.Param("url"))
+	if err != nil {
+		c.JSON(http.StatusFound, gin.H{
+			"available": false,
+			"reason":    err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusContinue, gin.H{
+		"available": available,
+	})
+	return
+
 }
 
 func (con controller) CreateProject(c *gin.Context) {
