@@ -6,13 +6,16 @@ import (
 	"main/internal/posts"
 	"main/internal/projects"
 	"main/internal/users"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/stripe/stripe-go/v72"
 )
 
 func main() {
 	godotenv.Load()
+	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
 	router := gin.Default()
 	auth.RegisterRoutes(router, auth.New())
 	creators.RegisterRoutes(router, creators.New())
