@@ -348,6 +348,11 @@ CREATE TABLE payout_method (
   default_method bool
 );
 
+CREATE TABLE paypal_payout_method (
+    payout_method_id int8 PRIMARY KEY REFERENCES payout_method ON DELETE CASCADE,
+    paypal_email varchar
+)
+
 -- CREATE TABLE stripe_card_payout_method (
 --   payout_method_id int8 PRIMARY KEY REFERENCES payout_method ON DELETE CASCADE,
 --   last_four int4,
