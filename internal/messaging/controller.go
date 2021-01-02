@@ -2,6 +2,7 @@ package messaging
 
 import (
 	"main/internal/dto"
+	"main/internal/utility"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -28,14 +29,14 @@ func (con controller) SendMessage(c *gin.Context) {
 		})
 		return
 	}
+	var err error
+	defer utility.ErrorHandleHTTP(c, err)
 	var m dto.CreateMessageDTO
 	c.BindQuery(&m)
 	m.SenderID = userID.(int)
-	err := con.service.SendMessage(m)
+	err = con.service.SendMessage(m)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		return
 	}
 	c.JSON(http.StatusAccepted, gin.H{
 		"message": "Success",
@@ -51,11 +52,10 @@ func (con controller) RetrieveSentMessages(c *gin.Context) {
 		})
 		return
 	}
+	var err error
+	defer utility.ErrorHandleHTTP(c, err)
 	messages, err := con.service.RetrieveUserSentMessages(userID.(int))
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusAccepted, gin.H{
-			"error": err.Error(),
-		})
 		return
 	}
 	c.JSON(http.StatusAccepted, messages)
@@ -70,11 +70,10 @@ func (con controller) RetrieveUserMessages(c *gin.Context) {
 		})
 		return
 	}
+	var err error
+	defer utility.ErrorHandleHTTP(c, err)
 	messages, err := con.service.RetrieveUserMessages(userID.(int))
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
 		return
 	}
 	c.JSON(http.StatusAccepted, messages)

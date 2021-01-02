@@ -3,6 +3,7 @@ package auth
 import (
 	"fmt"
 	"main/internal/dto"
+	"main/internal/utility"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -21,19 +22,14 @@ func RegisterRoutes(router *gin.Engine, service AuthService) {
 
 func (con controller) register(c *gin.Context) {
 	var request dto.AuthRegister
+	var err error
+	defer utility.ErrorHandleHTTP(c, err)
 	if err := c.BindJSON(&request); err != nil {
-		// fmt.Print(err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
 		return
 	}
 
 	user, err := con.service.Register(&request)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
 		return
 	}
 	jwt := CreateToken(user.ID)
@@ -45,17 +41,13 @@ func (con controller) register(c *gin.Context) {
 
 func (con controller) login(c *gin.Context) {
 	var request dto.AuthLogin
+	var err error
+	defer utility.ErrorHandleHTTP(c, err)
 	if err := c.BindJSON(&request); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
 		return
 	}
 	user, err := con.service.Login(request)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
 		return
 	} else if user.ID == 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{

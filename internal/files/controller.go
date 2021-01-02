@@ -1,7 +1,7 @@
 package files
 
 import (
-	"net/http"
+	"main/internal/utility"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,12 +16,11 @@ func RegisterRoutes(router *gin.Engine, service FileService) {
 }
 
 func (con controller) uploadFile(c *gin.Context) {
+	var err error
+	defer utility.ErrorHandleHTTP(c, err)
 	file, err := c.FormFile("file")
 
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"message": "No file is received",
-		})
 		return
 	}
 

@@ -97,7 +97,6 @@ func (auth AuthService) Register(request *dto.AuthRegister) (entity.User, error)
 	}
 	token := CreateToken(user.ID)
 	email.SendVerificationEmail(request.Email, request.Username, token.JWT)
-	// email.sendVerificationEmail()
 	return user, nil
 }
 
