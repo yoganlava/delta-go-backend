@@ -109,6 +109,7 @@ CREATE TABLE creator (
   user_id int8 REFERENCES users,
   creator_rank_id int4 REFERENCES creator_rank ON DELETE SET NULL,
   is_company bool,
+  stripe_account_id varchar,
   updated_at timestamptz,
   created_at timestamptz
 );
