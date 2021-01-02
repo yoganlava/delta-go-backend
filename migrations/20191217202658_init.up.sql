@@ -366,8 +366,7 @@ CREATE TABLE TRANSACTION (
   amount float8,
   sender_id int8 REFERENCES users,
   receiver_project_id int8 REFERENCES project NOT NULL,
-  created_at timestamptz,
-  updated_at timestamptz
+  created_at timestamptz
 );
 
 CREATE TABLE payout_transaction (
