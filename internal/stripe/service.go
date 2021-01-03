@@ -2,13 +2,14 @@ package stripe
 
 import (
 	"context"
+	"main/db"
 	"main/internal/dto"
 
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/stripe/stripe-go"
 	"github.com/stripe/stripe-go/account"
 	"github.com/stripe/stripe-go/accountlink"
 	"github.com/stripe/stripe-go/paymentintent"
-	"github.com/stripe/stripe-go/v72"
 )
 
 func handleSubscriptionWebhook() {
@@ -20,9 +21,14 @@ type StripeService struct {
 }
 
 type IStripeService interface {
+	CreateStripeAccount(email string, CreatorID int) (*stripe.Account, error)
+	CreateAccountLink(StripeAccountID string) (*stripe.AccountLink, error)
+	CreatePaymentIntent(donationDTO dto.DonationDTO) (*stripe.PaymentIntent, error)
 }
 
-func New() {}
+func New() StripeService {
+	return StripeService{db.Connection()}
+}
 
 func (ss StripeService) CreateStripeAccount(email string, CreatorID int) (*stripe.Account, error) {
 	params := &stripe.AccountParams{
@@ -38,11 +44,11 @@ func (ss StripeService) CreateStripeAccount(email string, CreatorID int) (*strip
 	return acc, err
 }
 
-func (ss StripeService) CreateAccountLink(StripeAccountID string) {
+func (ss StripeService) CreateAccountLink(StripeAccountID string) (*stripe.AccountLink, error) {
 	params := &stripe.AccountLinkParams{
 		Account:    stripe.String(StripeAccountID),
-		RefreshURL: stripe.String("https://onjin.jp/reauth"),
-		ReturnURL:  stripe.String("https://onjin.jp/"),
+		FailureURL: stripe.String("https://onjin.jp/reauth"),
+		SuccessURL: stripe.String("https://onjin.jp/"),
 		Type:       stripe.String("account_onboarding"),
 	}
 	acc, err := accountlink.New(params)
@@ -59,7 +65,7 @@ func (ss StripeService) CreatePaymentIntent(donationDTO dto.DonationDTO) (*strip
 		ApplicationFeeAmount: stripe.Int64(0),
 	}
 	var account_id string
-	err := ss.pool.QueryRow(context.Background(), `select creator.stripe_account_id from creator inner join project on creator.id=(select creator_id from project where id=$1)`, donationTransactionDTO).Scan(&account_id)
+	err := ss.pool.QueryRow(context.Background(), `select creator.stripe_account_id from creator inner join project on creator.id=(select creator_id from project where id=$1)`, donationDTO.ReceiverProjectID).Scan(&account_id)
 	if err != nil {
 		return nil, err
 	}

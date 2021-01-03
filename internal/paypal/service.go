@@ -2,9 +2,12 @@ package paypal
 
 import (
 	"context"
+	"main/db"
 	"main/internal/dto"
+	"os"
 
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/plutov/paypal"
 )
 
 type IPaypalService interface {
@@ -12,7 +15,16 @@ type IPaypalService interface {
 }
 
 type PaypalService struct {
-	pool *pgxpool.Pool
+	pool   *pgxpool.Pool
+	client *paypal.Client
+}
+
+func New() PaypalService {
+	c, err := paypal.NewClient(os.Getenv("PAYPAL_CLIENT"), os.Getenv("PAYPAL_SECRET"), paypal.APIBaseSandBox)
+	if err != nil {
+		panic(err)
+	}
+	return PaypalService{db.Connection(), c}
 }
 
 func (ps PaypalService) CreatePaypalPayout(createPaypalPayoutDTO dto.CreatePaypalPayoutDTO) error {
@@ -24,4 +36,35 @@ func (ps PaypalService) CreatePaypalPayout(createPaypalPayoutDTO dto.CreatePaypa
 	_, err = ps.pool.Exec(context.Background(), `insert into paypal_payout_method (payout_method_id, paypal_email) values ($1, $2)`, payout_method_id, createPaypalPayoutDTO.PaypalEmail)
 
 	return nil
+}
+
+func (ps PaypalService) CreatePaypalOrder(createDonationPaypalDTO dto.CreateDonationPaypalOrderDTO) (*paypal.Order, error) {
+	return ps.client.CreateOrder("CAPTURE", []paypal.PurchaseUnitRequest{
+		paypal.PurchaseUnitRequest{
+			Amount: &paypal.PurchaseUnitAmount{
+				Value:    createDonationPaypalDTO.Amount,
+				Currency: createDonationPaypalDTO.Currency,
+			},
+			Payee: &paypal.PayeeForOrders{
+				EmailAddress: createDonationPaypalDTO.CreatorEmail,
+			},
+		},
+	},
+		&paypal.CreateOrderPayer{
+			Name: &paypal.CreateOrderPayerName{
+				GivenName: createDonationPaypalDTO.PayerFirstName,
+				Surname:   createDonationPaypalDTO.PayerLastName,
+			},
+			EmailAddress: createDonationPaypalDTO.PayerEmail,
+		},
+		&paypal.ApplicationContext{
+			BrandName:          "",
+			Locale:             "",
+			LandingPage:        "",
+			ShippingPreference: "",
+			UserAction:         "",
+			ReturnURL:          "http://onjin.jp",
+			CancelURL:          "http://onjin.jp",
+		},
+	)
 }
