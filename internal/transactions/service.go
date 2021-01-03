@@ -20,7 +20,7 @@ func New() TransactionService {
 
 func (ts TransactionService) AddDonationTransaction(donationTransactionDTO dto.DonationTransactionDTO) error {
 	var id int
-	err := ts.pool.QueryRow(context.Background(), "insert into transaction (amount, sender_id, receiver_project_id, created_at) values ($1, $2, $3, now())", donationTransactionDTO.Amount, donationTransactionDTO.SenderID, donationTransactionDTO.ReceiverProjectID).Scan(&id)
+	err := ts.pool.QueryRow(context.Background(), "insert into transaction (amount, sender_id, receiver_project_id, created_at) values ($1, $2, $3, now()) returning id", donationTransactionDTO.Amount, donationTransactionDTO.SenderID, donationTransactionDTO.ReceiverProjectID).Scan(&id)
 	if err != nil {
 		return err
 	}
