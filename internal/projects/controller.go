@@ -19,11 +19,11 @@ func RegisterRoutes(router *gin.Engine, service ProjectService) {
 	{
 		r.GET("/:url", c.FetchProject)
 	}
-
+	r.GET("/:url/isAvailable", c.FetchIsURLAvailable)
 	r.Use(middleware.JwtMiddleware())
 	{
 		r.POST("/", c.CreateProject)
-		r.GET("/:url/isAvailable", c.FetchIsURLAvailable)
+
 	}
 }
 
