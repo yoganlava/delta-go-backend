@@ -29,7 +29,12 @@ type IProjectService interface {
 
 func (ps ProjectService) FetchProject(url string) (entity.Project, error) {
 	var p entity.Project
-	err := pgxscan.Get(context.Background(), ps.pool, &p, "select id, name, page_url, description, creating, banner_image_id, cover_image_id, creator_id, cover_id, category_id, setting, created_at, updated_at")
+	err := pgxscan.Get(context.Background(), ps.pool, &p, `select p.id, p.name, p.description, p.creating, p.banner, p.cover, p.setting, p.created_at,
+																													JSON_BUILD_OBJECT('name',c.name,'is_company',c.is_company,)
+																													from project p
+																													inner join creator c on c.id = p.creator_id
+																													inner join category ct on ct.id = p.category_id
+																													where page_url = $1`, url)
 	if err != nil {
 		return entity.Project{}, err
 	}
