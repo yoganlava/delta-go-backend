@@ -6,6 +6,7 @@ import (
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/stripe/stripe-go/account"
+	"github.com/stripe/stripe-go/accountlink"
 	"github.com/stripe/stripe-go/paymentintent"
 	"github.com/stripe/stripe-go/v72"
 )
@@ -21,16 +22,31 @@ type StripeService struct {
 type IStripeService interface {
 }
 
-func New()
+func New() {}
 
-func CreateStripeAccount(email string) (*stripe.Account, error) {
+func (ss StripeService) CreateStripeAccount(email string, CreatorID int) (*stripe.Account, error) {
 	params := &stripe.AccountParams{
 		Country: stripe.String("JP"),
 		Email:   stripe.String(email),
 		Type:    stripe.String(string(stripe.AccountTypeStandard)),
 	}
-	acct, err := account.New(params)
-	return acct, err
+	acc, err := account.New(params)
+	if err != nil {
+		return &stripe.Account{}, err
+	}
+	_, err = ss.pool.Exec(context.Background(), "update creator set stripe_account_id=$1 where id=$2", acc.ID, CreatorID)
+	return acc, err
+}
+
+func (ss StripeService) CreateAccountLink(StripeAccountID string) {
+	params := &stripe.AccountLinkParams{
+		Account:    stripe.String(StripeAccountID),
+		RefreshURL: stripe.String("https://onjin.jp/reauth"),
+		ReturnURL:  stripe.String("https://onjin.jp/"),
+		Type:       stripe.String("account_onboarding"),
+	}
+	acc, err := accountlink.New(params)
+	return acc, err
 }
 
 func (ss StripeService) CreatePaymentIntent(donationDTO dto.DonationDTO) (*stripe.PaymentIntent, error) {
