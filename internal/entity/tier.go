@@ -1,5 +1,7 @@
 package entity
 
+import "time"
+
 type Tier struct {
 	ID           int
 	Title        string
@@ -7,6 +9,6 @@ type Tier struct {
 	CoverImageID int
 	Price        float32
 	ProjectID    int
-	CreatedAt    string
-	UpdatedAt    string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
