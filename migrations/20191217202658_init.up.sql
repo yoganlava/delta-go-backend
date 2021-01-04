@@ -283,7 +283,7 @@ CREATE TABLE goal (
   description text,
   goal float8,
   TYPE goal_type,
-  project_id int8 REFERENCES project ON DELETE CASCADE,
+  project_id int8,
   created_at timestamptz,
   updated_at timestamptz
 );
@@ -297,8 +297,8 @@ CREATE TABLE benefit (
 );
 
 CREATE TABLE tier_benefit (
-  tier_id int8 REFERENCES tier ON DELETE CASCADE,
-  benefit_id int8 REFERENCES benefit ON DELETE CASCADE,
+  tier_id int8 ,
+  benefit_id int8,
   PRIMARY KEY (tier_id, benefit_id)
 );
 
@@ -335,7 +335,7 @@ CREATE TABLE payout_method (
 );
 
 CREATE TABLE paypal_payout_method (
-    payout_method_id int8 PRIMARY KEY REFERENCES payout_method ON DELETE CASCADE,
+    payout_method_id int8 PRIMARY KEY,
     paypal_email varchar
 )
 
@@ -386,6 +386,10 @@ CREATE TABLE message (
   body text,
   created_at timestamptz
 );
+
+ALTER TABLE tier_benefit ADD CONSTRAINT tier_benefit_benefit_fk FOREIGN KEY (benefit_id) REFERENCES benefit (id) on delete cascade;
+ALTER TABLE tier_benefit ADD CONSTRAINT tier_benefit_tier_fk FOREIGN KEY (tier_id) REFERENCES tier (id) on delete cascade;
+
 ALTER TABLE users ADD CONSTRAINT user_avatar_fk FOREIGN KEY (avatar) REFERENCES file (location);
 ALTER TABLE user_profile ADD CONSTRAINT user_profile_fk FOREIGN KEY (user_id) REFERENCES users (id);
 ALTER TABLE user_info ADD CONSTRAINT user_info_fk FOREIGN KEY (user_id) REFERENCES users (id);
@@ -409,6 +413,10 @@ ALTER TABLE message ADD CONSTRAINT message_receiver_fk FOREIGN KEY (receiver_id)
 
 ALTER TABLE payment_method ADD CONSTRAINT payment_method_user_fk FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
 ALTER TABLE stripe_card_payment_method ADD CONSTRAINT stripe_card_payment_method_fk FOREIGN KEY (payment_method_id) REFERENCES payment_method (id) ON DELETE CASCADE;
+
+ALTER TABLE paypal_payout_method ADD CONSTRAINT paypal_payout_method_fk FOREIGN KEY (payout_method_id) REFERENCES payout_method (id) ON DELETE CASCADE;
+goal
+ALTER TABLE goal ADD CONSTRAINT goal_project_fk FOREIGN KEY (project_id) REFERENCES project (id) ON DELETE CASCADE;
 
 ALTER TABLE creator ADD CONSTRAINT creator_creator_rank_fk FOREIGN KEY (creator_rank_id) REFERENCES creator_rank (id) ON DELETE set  NULL;
 

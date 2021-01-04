@@ -3,6 +3,7 @@ package projects
 import (
 	"context"
 	"errors"
+	"fmt"
 	"main/db"
 	"main/internal/dto"
 	"main/internal/entity"
@@ -29,13 +30,15 @@ type IProjectService interface {
 
 func (ps ProjectService) FetchProject(url string) (entity.Project, error) {
 	var p entity.Project
-	err := pgxscan.Get(context.Background(), ps.pool, &p, `select p.id, p.name, p.description, p.creating, p.banner, p.cover, p.setting, p.created_at,
-																													JSON_BUILD_OBJECT('name',c.name,'is_company',c.is_company,)
+	err := pgxscan.Get(context.Background(), ps.pool, &p, `select p.id, p.name, p.description, p.creating, p.banner, p.avatar, p.setting, p.created_at,
+																													JSON_BUILD_OBJECT('name',c.name,'is_company',c.is_company,'id',c.id) as creator
 																													from project p
 																													inner join creator c on c.id = p.creator_id
 																													inner join category ct on ct.id = p.category_id
-																													where page_url = $1`, url)
+																													where lower(page_url) = lower($1)
+																													group by p.id,c.id`, url)
 	if err != nil {
+		fmt.Print(err.Error())
 		return entity.Project{}, err
 	}
 	return p, nil

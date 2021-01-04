@@ -37,7 +37,9 @@ func (con controller) FetchProject(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(http.StatusAccepted, project)
+	c.JSON(http.StatusAccepted, gin.H{
+		"project": project,
+	})
 }
 
 func (con controller) FetchIsURLAvailable(c *gin.Context) {

@@ -1,13 +1,3 @@
 {
-
-  "sender": {
-    "name": "Onjin",
-    "email": "noreply@onjin.jp",
-    "id": -2
-  },
-  "to": [{
-    "email": "$1",
-    "name": "$2"
-  }],
-  "htmlContent": "$3"
+  "show_total_earning": false
 }

@@ -1,30 +1,32 @@
 package entity
 
+import "time"
+
 type Project struct {
 	ID             int            `json:"id"`
 	Name           string         `json:"name"`
 	PageURL        string         `json:"page_url"`
 	Description    string         `json:"description"`
 	Creating       string         `json:"creating"`
-	BannerImageID  int            `json:"banner_image_id"`
-	CoverImageID   int            `json:"cover_image_id"`
-	CreatorID      int            `json:"creator_id"`
-	CoverID        int            `json:"cover_id"`
-	CategoryID     int            `json:"category_id"`
-	IsCrowdFunding bool           `json:"is_crowd_funding"`
+	Banner         string         `json:"banner"`
+	Avatar         string         `json:"avatar"`
+	CreatorID      *int           `json:"creator_id,omitempty"`
+	CategoryID     *int           `json:"category_id,omitempty"`
+	IsCrowdFunding *bool          `json:"is_crowd_funding,omitempty"`
 	Setting        ProjectSetting `json:"setting"`
-	CreatedAt      string         `json:"created_at"`
-	UpdatedAt      string         `json:"updated_at"`
+	CreatedAt      *time.Time     `json:"created_at"`
+	UpdatedAt      *time.Time     `json:"updated_at,omitempty"`
+	Creator        CreatorProject `json:"creator"`
 }
 
 type ProjectSetting struct {
-	ShowTotalEarning bool `json:"show_total_earning"`
-	ShowTopSupporter bool `json:"show_top_supporter"`
-	AnyOneCanComment bool `json:"anyone_can_comment"`
+	ShowTotalEarning bool `json:"show_total_earning,omitempty"`
+	ShowTopSupporter bool `json:"show_top_supporter,omitempty"`
+	AnyOneCanComment bool `json:"anyone_can_comment,omitempty"`
 }
 
 type CreatorProject struct {
-	ID      int    `json:"id"`
-	Name    string `json:"name"`
-	PageURL string `json:"page_url"`
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	IsCompany bool   `json:"is_company"`
 }
