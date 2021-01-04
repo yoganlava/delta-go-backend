@@ -1,7 +1,8 @@
-package stripe
+package stripemod
 
 import (
 	"context"
+	"fmt"
 	"main/db"
 	"main/internal/dto"
 
@@ -12,8 +13,11 @@ import (
 	"github.com/stripe/stripe-go/paymentintent"
 )
 
-func handleSubscriptionWebhook() {
+func (ss StripeService) HandleStripeWebhook(event stripe.Event) {
+	fmt.Println(event)
+	if event.Type == "payment_intent.succeeded" {
 
+	}
 }
 
 type StripeService struct {
