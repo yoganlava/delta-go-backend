@@ -12,6 +12,7 @@ import (
 
 type IPaypalService interface {
 	CreatePaypalPayout(createPaypalPayoutDTO dto.CreatePaypalPayoutDTO) error
+	CreatePaypalOrder(createDonationPaypalDTO dto.CreateDonationPaypalOrderDTO) (*paypal.Order, error)
 }
 
 type PaypalService struct {

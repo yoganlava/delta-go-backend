@@ -330,14 +330,14 @@ CREATE TABLE payout_method (
   full_name varchar,
   created_at timestamptz,
   updated_at timestamptz,
-  creator_id int8 ,
+  creator_id int8,
   default_method bool
 );
 
 CREATE TABLE paypal_payout_method (
     payout_method_id int8 PRIMARY KEY REFERENCES payout_method ON DELETE CASCADE,
     paypal_email varchar
-)
+);
 
 -- CREATE TABLE stripe_card_payout_method (
 --   payout_method_id int8 PRIMARY KEY REFERENCES payout_method ON DELETE CASCADE,
@@ -386,6 +386,7 @@ CREATE TABLE message (
   body text,
   created_at timestamptz
 );
+
 ALTER TABLE users ADD CONSTRAINT user_avatar_fk FOREIGN KEY (avatar) REFERENCES file (location);
 ALTER TABLE user_profile ADD CONSTRAINT user_profile_fk FOREIGN KEY (user_id) REFERENCES users (id);
 ALTER TABLE user_info ADD CONSTRAINT user_info_fk FOREIGN KEY (user_id) REFERENCES users (id);

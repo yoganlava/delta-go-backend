@@ -1,11 +1,7 @@
 package main
 
 import (
-	"main/internal/auth"
-	"main/internal/creators"
-	"main/internal/posts"
-	"main/internal/projects"
-	"main/internal/users"
+	"main/internal/stripemod"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -17,10 +13,11 @@ func main() {
 	godotenv.Load()
 	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
 	router := gin.Default()
-	auth.RegisterRoutes(router, auth.New())
-	creators.RegisterRoutes(router, creators.New())
-	posts.RegisterRoutes(router, posts.New())
-	projects.RegisterRoutes(router, projects.New())
-	users.RegisterRoutes(router, users.New())
+	stripemod.RegisterRoutes(router, stripemod.New())
+	// auth.RegisterRoutes(router, auth.New())
+	// creators.RegisterRoutes(router, creators.New())
+	// posts.RegisterRoutes(router, posts.New())
+	// projects.RegisterRoutes(router, projects.New())
+	// users.RegisterRoutes(router, users.New())
 	router.Run(":5000")
 }
