@@ -16,7 +16,7 @@ import (
 func (ss StripeService) HandleStripeWebhook(event stripe.Event) {
 	fmt.Println(event)
 	if event.Type == "payment_intent.succeeded" {
-
+		// Handle successful payment
 	}
 }
 

@@ -69,3 +69,7 @@ func (ps PaypalService) CreatePaypalOrder(createDonationPaypalDTO dto.CreateDona
 		},
 	)
 }
+
+func (ps PaypalService) HandleWebhook() {
+
+}
