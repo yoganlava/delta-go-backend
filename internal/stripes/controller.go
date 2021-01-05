@@ -1,4 +1,4 @@
-package stripemod
+package stripes
 
 import (
 	"main/internal/utility"
@@ -14,7 +14,7 @@ type controller struct {
 
 func RegisterRoutes(router *gin.Engine, service StripeService) {
 	c := controller{service}
-	s := router.Group("/stripe")
+	s := router.Group("/stripes")
 	s.POST("/webhook", c.HandleStripeWebhook)
 }
 

@@ -1,4 +1,4 @@
-package stripemod
+package stripes
 
 import (
 	"context"
