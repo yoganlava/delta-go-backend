@@ -261,8 +261,8 @@ CREATE TABLE post_poll_option (
 );
 
 CREATE TABLE post_poll_answer (
-  user_id int8 REFERENCES users,
-  post_poll_option_id int8 REFERENCES post_poll_option ON DELETE CASCADE,
+  user_id int8,
+  post_poll_option_id int8 ,
   PRIMARY KEY (user_id, post_poll_option_id)
 );
 
@@ -387,12 +387,13 @@ CREATE TABLE message (
   created_at timestamptz
 );
 
-<<<<<<< HEAD
+
+ALTER TABLE post_poll_answer ADD CONSTRAINT post_poll_answer_user_fk FOREIGN KEY (user_id) REFERENCES users (id) on delete cascade;
+ALTER TABLE post_poll_answer ADD CONSTRAINT post_poll_answer_option_fk FOREIGN KEY (post_poll_option_id) REFERENCES post_poll_option (id) on delete cascade;
+
 ALTER TABLE tier_benefit ADD CONSTRAINT tier_benefit_benefit_fk FOREIGN KEY (benefit_id) REFERENCES benefit (id) on delete cascade;
 ALTER TABLE tier_benefit ADD CONSTRAINT tier_benefit_tier_fk FOREIGN KEY (tier_id) REFERENCES tier (id) on delete cascade;
 
-=======
->>>>>>> b2867aea2732cfe8aa6064b68b94165e00ad06f7
 ALTER TABLE users ADD CONSTRAINT user_avatar_fk FOREIGN KEY (avatar) REFERENCES file (location);
 ALTER TABLE user_profile ADD CONSTRAINT user_profile_fk FOREIGN KEY (user_id) REFERENCES users (id);
 ALTER TABLE user_info ADD CONSTRAINT user_info_fk FOREIGN KEY (user_id) REFERENCES users (id);

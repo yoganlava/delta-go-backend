@@ -12,3 +12,13 @@ type Post struct {
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
+
+type PostText struct {
+	PostID    int `json:"post_id"`
+	WordCount int `json:"word_count"`
+	CharCount int `json:"char_count"`
+}
+type PostTier struct {
+	PostID int `json:"post_id"`
+	TierID int `json:"tier_id"`
+}
