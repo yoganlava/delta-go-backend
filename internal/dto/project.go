@@ -1,5 +1,7 @@
 package dto
 
+import "main/internal/entity"
+
 type CreateProjectDTO struct {
 	Name           string `json:"name"`
 	PageURL        string `json:"page_url"`
@@ -15,4 +17,11 @@ type CreateProjectDTO struct {
 
 type DonateToProjectDTO struct {
 	ProjectID string `json:"project_id"`
+}
+
+type FeedProjectDTO struct {
+	Post         *entity.Post                    `json:"post"`
+	Donation     *entity.DonationTransaction     `json:"donation"`
+	Subscription *entity.SubscriptionTransaction `json:"subscription"`
+	Type         string                          `json:"type"`
 }

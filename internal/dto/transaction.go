@@ -2,7 +2,7 @@ package dto
 
 type TransactionDTO struct {
 	Amount            float32 `json:"amount"`
-	SenderID          int     `json:"sender_id"`
+	SenderID          int     `json:"sender_id,omitempty"`
 	ReceiverProjectID int     `json:"receiver_project_id"`
 }
 
