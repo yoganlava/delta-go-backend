@@ -30,3 +30,10 @@ type CreatorProject struct {
 	Name      string `json:"name"`
 	IsCompany bool   `json:"is_company"`
 }
+
+type Feed struct {
+	Post         *Post                    `json:"post"`
+	Donation     *DonationTransaction     `json:"donation"`
+	Subscription *SubscriptionTransaction `json:"subscription"`
+	Type         string                   `json:"type"`
+}

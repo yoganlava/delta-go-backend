@@ -43,7 +43,35 @@ func (ps ProjectService) FetchProject(url string) (entity.Project, error) {
 	}
 	return p, nil
 }
+func (ps ProjectService) FetchProjectFeed(url string, user_id int) ([]entity.Feed, error) {
+	var feeds []entity.Feed
+	var tier entity.Tier
+	var err error
+	if user_id > 0 {
+		err = pgxscan.Get(context.Background(), ps.pool, &tier, `
+		select t.price,t.id,t.project_id
+		from users u
+		inner join subscription s on s.user_id = u.id
+		inner join tier t on t.tier_id = s.tier_id and t.project_id = (select id from project where lower(page_url) = lower($2) limit 1)
+		where id = $1
+		`, user_id, url)
+		err = pgxscan.Select(context.Background(), ps.pool, &feeds, `
+		select p.id as id,case when p.min_price > $1 JSON_BUILD_OBJECT('min_price',p.min_price) as post, null as donation, null as subscription,'post' as type
+		from project pr
+		inner join post p on p.project_id = pr.id
+		inner join post_tag pt on pt.post_id = p.id
+		inner join tag t on t.id = pt.tag_id
 
+	`)
+	} else {
+
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	return feeds, err
+}
 func (ps ProjectService) CreateProject(p dto.CreateProjectDTO) error {
 	_, err := ps.pool.Exec(context.Background(), "insert into project (name, page_url, description, creating, creator_id, cover_id, category_id, setting, created_at, updated_at) values ($1, $2, $3, $4, $5, $6, $7, $8, now(), now())", p.Name, p.PageURL, p.Description, p.Creating, p.CreatorID, p.CoverID, p.CategoryID)
 	if err != nil {
