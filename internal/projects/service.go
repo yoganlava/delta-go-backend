@@ -61,7 +61,7 @@ func (ps ProjectService) FetchProjectFeed(url string, user_id int) ([]entity.Fee
 		inner join post p on p.project_id = pr.id
 		inner join post_tag pt on pt.post_id = p.id
 		inner join tag t on t.id = pt.tag_id
-
+		
 	`)
 	} else {
 
