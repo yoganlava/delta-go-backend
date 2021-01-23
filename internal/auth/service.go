@@ -14,6 +14,10 @@ import (
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"golang.org/x/crypto/bcrypt"
+
+	// "golang.org/x/oauth2/"
+	"google.golang.org/api/oauth2/v2"
+	"google.golang.org/api/option"
 )
 
 type IAuthService interface {
@@ -25,7 +29,8 @@ type IAuthService interface {
 	// VerifyToken(tokenString string) (int error)
 }
 type AuthService struct {
-	pool *pgxpool.Pool
+	pool        *pgxpool.Pool
+	oauthClient *oauth2.Service
 }
 
 type UserClaim struct {
@@ -34,7 +39,15 @@ type UserClaim struct {
 }
 
 func New() AuthService {
-	return AuthService{db.Connection()}
+	oauthClient, err := oauth2.NewService(context.Background(), option.WithScopes(oauth2.OpenIDScope, oauth2.UserinfoEmailScope, oauth2.UserinfoProfileScope))
+	if err != nil {
+		panic(err)
+	}
+
+	return AuthService{
+		db.Connection(),
+		oauthClient,
+	}
 }
 
 // CreateToken for user
@@ -76,6 +89,52 @@ func VerifyToken(tokenString string) (int, error) {
 		return -1, errors.New("トークンの期限が切れています")
 	}
 	return token.Claims.(*UserClaim).ID, nil
+}
+
+func (auth AuthService) HandleGoogleAuthentication(tokenString string) (entity.AuthUser, error) {
+	tokenInfo, err := auth.oauthClient.Tokeninfo().IdToken(tokenString).Do()
+	var u = entity.AuthUser{}
+	if err != nil {
+		return entity.AuthUser{}, errors.New("token err")
+	}
+
+	err = pgxscan.Get(context.Background(), auth.pool, &u, `
+	select 
+	u.id,u.username,u.password,u.email,u.created_at,u.gender,u.verified,
+	f.location as avatar
+	from users u
+	inner join file f on f.id = u.avatar_image_id
+	where u.social_id = $1`, tokenInfo.UserId)
+	if err != nil {
+		return entity.AuthUser{}, err
+	}
+
+	if u.ID != 0 {
+		return u, nil
+	}
+	pgxscan.Get(context.Background(), auth.pool, &u, `
+		select * from users where lower(email) = $1
+	`, tokenInfo.Email)
+
+	if u.ID > 0 {
+		return entity.AuthUser{}, errors.New("ユーザー名またはEメールがもう使われています")
+	}
+
+	err = pgxscan.Get(context.Background(), auth.pool, &u, `
+	insert into users
+	(email, username, verified, created_at, updated_at, strategy, avatar) 
+	values
+	($1, $2, true, now(), now(), 'google', 'https://img.jpmtl.com/default_profile.png')
+	returning
+	id, email, username, verified, created_at, avatar`,
+		tokenInfo.Email, tokenInfo.Email,
+	)
+
+	if err != nil {
+		return entity.AuthUser{}, err
+	}
+	return u, nil
+
 }
 
 // Register user
@@ -124,6 +183,8 @@ func (auth AuthService) Login(request dto.AuthLogin) (entity.AuthUser, error) {
 	u.Password = ""
 	return u, nil
 }
+
+// func
 
 // Rudimentary
 // func (auth AuthService) sendVerificationEmail(user_id int) error {
