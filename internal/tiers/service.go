@@ -28,11 +28,60 @@ func New() TierService {
 }
 
 func (ts TierService) CreateTier(t dto.CreateTierDTO) error {
-	_, err := ts.pool.Exec(context.Background(), "insert into tier (title, description, cover_image_id, price, project_id, created_at, updated_at) values ($1,$2,$3,$4,$5,now(),now())", t.Name, t.Description, t.CoverImageID, t.Price, t.ProjectID)
-	if err != nil {
-		return err
-	}
-	return nil
+	_, err := ts.pool.Exec(context.Background(), `
+	insert into tier
+	(title, description, cover_image_id, price, project_id, created_at, updated_at)
+	values
+	($1, $2, $3, $4, $5, now(), now())`,
+		t.Name, t.Description, t.CoverImageID, t.Price, t.ProjectID,
+	)
+	return err
+}
+
+func (ts TierService) EditTier(t dto.EditTierDTO) error {
+	_, err := ts.pool.Exec(context.Background(), `
+	update tier
+	set description = $2, cover_image_id = $3, price = $4, updated_at = now()
+	where id = $1
+	`,
+		t.TierID, t.Description, t.CoverImageID, t.Price,
+	)
+	return err
+}
+
+func (ts TierService) CreateTierBenefit(b dto.CreateTierBenefitDTO) error {
+	_, err := ts.pool.Exec(context.Background(), `
+	insert into benefit
+	(description, benefit_period, created_at, updated_at)
+	values
+	($1, $2, now(), now())
+	`,
+		b.Description, b.BenefitPeriod,
+	)
+	return err
+}
+
+func (ts TierService) EditTierBenefit(b dto.EditTierBenefitDTO) error {
+	_, err := ts.pool.Exec(context.Background(), `
+	update benefit
+	set description = $2, benefit_period = $3, updated_at = now()
+	where id = $1
+	`,
+		b.BenefitID, b.Description, b.BenefitPeriod,
+	)
+	return err
+}
+
+func (ts TierService) LinkTierBenefit(b dto.LinkTierBenefitDTO) error {
+	_, err := ts.pool.Exec(context.Background(), `
+	insert into tier_benefit
+	(tier_id, benefit_id)
+	values
+	($1, $2)
+	`,
+		b.TierID, b.BenefitID,
+	)
+	return err
 }
 
 func (ts TierService) FetchProjectTiers(id int) ([]*entity.Tier, error) {

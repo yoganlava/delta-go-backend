@@ -24,6 +24,11 @@ func New() PostService {
 
 func (ps PostService) FetchProjectPosts(creatorID int) ([]*entity.Post, error) {
 	var p []*entity.Post
-	err := pgxscan.Select(context.Background(), ps.pool, &p, "select id, title, content, mature, project_id, submit_id, created_at, updated_at where id=$1", creatorID)
+	err := pgxscan.Select(context.Background(), ps.pool, &p, `
+	select
+	id, title, content, mature, project_id, submit_id, created_at, updated_at
+	where id=$1`,
+		creatorID,
+	)
 	return p, err
 }
