@@ -61,7 +61,6 @@ func (ps ProjectService) FetchProjectFeed(url string, user_id int) ([]entity.Fee
 		inner join post p on p.project_id = pr.id
 		inner join post_tag pt on pt.post_id = p.id
 		inner join tag t on t.id = pt.tag_id
-		
 	`)
 	} else {
 
@@ -73,7 +72,14 @@ func (ps ProjectService) FetchProjectFeed(url string, user_id int) ([]entity.Fee
 	return feeds, err
 }
 func (ps ProjectService) CreateProject(p dto.CreateProjectDTO) error {
-	_, err := ps.pool.Exec(context.Background(), "insert into project (name, page_url, description, creating, creator_id, cover_id, category_id, setting, created_at, updated_at) values ($1, $2, $3, $4, $5, $6, $7, $8, now(), now())", p.Name, p.PageURL, p.Description, p.Creating, p.CreatorID, p.CoverID, p.CategoryID)
+	_, err := ps.pool.Exec(context.Background(), `
+	insert into
+	project
+	(name, page_url, description, creating, creator_id, cover_id, category_id, setting, created_at, updated_at)
+	values
+	($1, $2, $3, $4, $5, $6, $7, $8, now(), now())`,
+		p.Name, p.PageURL, p.Description, p.Creating, p.CreatorID, p.CoverID, p.CategoryID,
+	)
 	if err != nil {
 		return err
 	}
@@ -82,8 +88,7 @@ func (ps ProjectService) CreateProject(p dto.CreateProjectDTO) error {
 
 func (ps ProjectService) isPageURLAvailable(url string) (bool, error) {
 	for _, page := range NotAllowedURL {
-		lowerd_url := strings.ToLower(url)
-		if page == lowerd_url {
+		if page == strings.ToLower(url) {
 			return false, nil
 		}
 	}
@@ -103,6 +108,23 @@ func (ps ProjectService) isPageURLAvailable(url string) (bool, error) {
 		return false, errors.New("このURLはもう使われています。")
 	}
 	return true, nil
+}
+
+func (ps ProjectService) SearchProjectsByName(name string, limit int, offset int) ([]*entity.SearchProject, error) {
+	var projects []*entity.SearchProject
+	err := pgxscan.Select(context.Background(), ps.pool, &projects, `
+	select
+	p.id, p.name, p.avatar_image_id, p.category_id, f.location as avatar, ca.name as category
+	from project p
+	where
+	name like '%$1%'
+	inner join file f on f.id = p.avatar_image_id
+	inner join category ca on ca.id = p.category_id
+	limit $2 offset $3
+	`,
+		name, limit, offset,
+	)
+	return projects, err
 }
 
 //! Temporary, does not belong here

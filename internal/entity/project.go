@@ -19,6 +19,13 @@ type Project struct {
 	Creator        CreatorProject `json:"creator"`
 }
 
+type SearchProject struct {
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	Creating string `json:"creating"`
+	Category string `json:"category"`
+}
+
 type ProjectSetting struct {
 	ShowTotalEarning bool `json:"show_total_earning,omitempty"`
 	ShowTopSupporter bool `json:"show_top_supporter,omitempty"`

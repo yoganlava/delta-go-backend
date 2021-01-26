@@ -64,7 +64,21 @@ func (cs CreatorService) FetchCreator(id int, user_id int) (entity.Creator, erro
 	return c, nil
 }
 
-func (cs CreatorService) SearchCreator() {}
+func (cs CreatorService) SearchCreators(name string, limit int, offset int) ([]*entity.SearchCreator, error) {
+	var creators []*entity.SearchCreator
+	err := pgxscan.Select(context.Background(), cs.pool, &creators, `
+	select
+	c.id, c.name, c.avatar_image_id, f.location as avatar
+	from creator c
+	where
+	name like '%$1%'
+	inner join file f on f.id = c.avatar_image_id
+	limit $2 offset $3
+	`,
+		name, limit, offset,
+	)
+	return creators, err
+}
 
 func (cs CreatorService) CreateCreator(c dto.CreateCreatorDTO) (entity.Creator, error) {
 	var creator entity.Creator

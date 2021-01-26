@@ -28,7 +28,7 @@ func (con controller) register(c *gin.Context) {
 		return
 	}
 
-	user, err := con.service.Register(&request)
+	user, err := con.service.Register(request)
 	if err != nil {
 		return
 	}

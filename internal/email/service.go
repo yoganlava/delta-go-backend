@@ -3,17 +3,12 @@ package email
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"main/internal/entity"
 	"net/http"
 	"os"
 )
 
-func SendVerificationEmail(email string, username string, token string) error {
-	emailHTML := fmt.Sprintf(
-		`<h1>Welcome %v</h1>
-	<a href='http://onjin.jp/verify/%v'>Click me</a>
-	`, username, token)
+func SendEmail(email string, username string, subject string, body string) error {
 	postBody, _ := json.Marshal(entity.SendInBlueType{
 		Sender: entity.SendInBlueSender{
 			Name:  "Onjin",
@@ -24,7 +19,8 @@ func SendVerificationEmail(email string, username string, token string) error {
 			Email: email,
 			Name:  username,
 		}},
-		HTMLContent: emailHTML,
+		Subject:     subject,
+		HTMLContent: body,
 	})
 	responseBody := bytes.NewBuffer(postBody)
 	req, _ := http.NewRequest("POST", "https://api.sendinblue.com/v3/smtp/email", responseBody)

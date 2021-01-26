@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"fmt"
 	"main/db"
 	"main/internal/dto"
 	"main/internal/email"
@@ -138,7 +139,7 @@ func (auth AuthService) HandleGoogleAuthentication(tokenString string) (entity.A
 }
 
 // Register user
-func (auth AuthService) Register(request *dto.AuthRegister) (entity.User, error) {
+func (auth AuthService) Register(request dto.AuthRegister) (entity.User, error) {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(request.Password), 10)
 	var user entity.User
 	pgxscan.Get(context.Background(), auth.pool, &user, `
@@ -155,7 +156,12 @@ func (auth AuthService) Register(request *dto.AuthRegister) (entity.User, error)
 		return entity.User{}, err
 	}
 	token := CreateToken(user.ID)
-	email.SendVerificationEmail(request.Email, request.Username, token.JWT)
+	email.SendEmail(request.Email, request.Username, "Verify your email!", fmt.Sprintf(`
+	<h1>Welcome %v</h1>
+	<a href='http://onjin.jp/verify/%v'>Click me</a>
+	`,
+		request.Username, token.JWT),
+	)
 	return user, nil
 }
 

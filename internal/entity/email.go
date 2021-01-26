@@ -10,6 +10,7 @@ type SendInBlueTo struct {
 	Name  string `json:"name"`
 }
 type SendInBlueType struct {
+	Subject     string           `json:"subject"`
 	HTMLContent string           `json:"htmlContent"`
 	Sender      SendInBlueSender `json:"sender"`
 	To          []SendInBlueTo   `json:"to"`

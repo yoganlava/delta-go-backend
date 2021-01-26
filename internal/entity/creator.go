@@ -15,11 +15,17 @@ type Creator struct {
 	CreatorProfile CreatorProfile `json:"creator_profile"`
 }
 
+type SearchCreator struct {
+	ID     int    `json:"id"`
+	Name   string `json:"name"`
+	Avatar string `json:"avatar"`
+}
+
 type CreatorRank struct {
-	ID            int     `json:"id"`
-	Fee           float32 `json:"fee"`
-	Name          string  `json:"name"`
-	Importantance int     `json:"importance"`
+	ID         int     `json:"id"`
+	Fee        float32 `json:"fee"`
+	Name       string  `json:"name"`
+	Importance int     `json:"importance"`
 }
 
 type CreatorProfile struct {
