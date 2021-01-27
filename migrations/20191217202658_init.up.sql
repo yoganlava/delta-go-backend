@@ -109,8 +109,9 @@ CREATE TABLE creator (
   name varchar,
   avatar varchar REFERENCES file (LOCATION),
   user_id int8 REFERENCES users,
-  creator_rank_id int4 ,
+  creator_rank_id int4,
   is_company bool,
+  is_nsfw bool,
   stripe_account_id varchar,
   updated_at timestamptz,
   created_at timestamptz

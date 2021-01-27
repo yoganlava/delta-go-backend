@@ -38,7 +38,7 @@ func (cs CreatorService) FetchCreator(id int, user_id int) (entity.Creator, erro
 		return c, nil
 	}
 	err = pgxscan.Get(context.Background(), cs.pool, &c, `
-	 select c.id,c.name,c.avatar_image_id,
+	 select c.id,c.name,c.is_nsfw, c.avatar_image_id,
 	 c.user_id,c.updated_at,c.created_at, 
 	 JSON_BUILD_OBJECT('bio',cp.bio) as creator_profile,
 	 JSON_BUILD_OBJECT('name',cr.name,'fee',cr.fee) as creator_rank
@@ -68,7 +68,7 @@ func (cs CreatorService) SearchCreators(name string, limit int, offset int) ([]*
 	var creators []*entity.SearchCreator
 	err := pgxscan.Select(context.Background(), cs.pool, &creators, `
 	select
-	c.id, c.name, c.avatar_image_id, f.location as avatar
+	c.id, c.name, c.is_nsfw, c.avatar_image_id, f.location as avatar
 	from creator c
 	where
 	name like '%$1%'

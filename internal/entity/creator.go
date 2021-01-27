@@ -9,6 +9,7 @@ type Creator struct {
 	AvatarImageID  int            `json:"avatar_image_id"`
 	UserID         int            `json:"user_id"`
 	CreatorRankID  int            `json:"creator_rank_id"`
+	IsNSFW         bool           `json:"is_nsfw"`
 	UpdatedAt      time.Time      `json:"updated_at"`
 	CreatedAt      time.Time      `json:"created_at"`
 	CreatorRank    CreatorRank    `json:"creator_rank"`
@@ -19,6 +20,7 @@ type SearchCreator struct {
 	ID     int    `json:"id"`
 	Name   string `json:"name"`
 	Avatar string `json:"avatar"`
+	IsNSFW bool   `json:"is_nsfw"`
 }
 
 type CreatorRank struct {
