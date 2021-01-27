@@ -82,9 +82,21 @@ func (cs CreatorService) SearchCreators(name string, limit int, offset int) ([]*
 
 func (cs CreatorService) CreateCreator(c dto.CreateCreatorDTO) (entity.Creator, error) {
 	var creator entity.Creator
-	err := pgxscan.Get(context.Background(), cs.pool, &creator, "insert into creator (name,avatar_image_id,user_id,creator_rank_id,created_at,updated_at) values($1,$2,$3,1,now(),now()) returning id,name,avatar_image_id,user_id,creator_rank_id,updated_at,created_at", c.Name, c.AvatarImageID, c.UserID)
+	err := pgxscan.Get(context.Background(), cs.pool, &creator, `
+	insert into creator
+	(name, avatar_image_id, user_id, creator_rank_id, is_nsfw, created_at, updated_at)
+	values
+	($1, $2, $3, 1, $4, now(), now())
+	returning id, name, avatar_image_id, user_id, creator_rank_id, is_nsfw, updated_at, created_at`,
+		c.Name, c.AvatarImageID, c.UserID, c.IsNSFW,
+	)
 	go func() {
-		_, err := cs.pool.Exec(context.Background(), "insert into creator_profile (bio,creator_id)  values($1,$2)", c.Bio, creator.ID)
+		_, err := cs.pool.Exec(context.Background(), `
+		insert into creator_profile
+		(bio,creator_id)
+		values($1,$2)`,
+			c.Bio, creator.ID,
+		)
 		if err != nil {
 			fmt.Println(err.Error())
 		}
@@ -113,9 +125,10 @@ func (cs CreatorService) UpdateCreator(c dto.UpdateCreatorDTO) (entity.Creator, 
 	}
 	_, err = trans.Exec(context.Background(), `
 	update creator
-	set name = $1,bio = $2, avatar_image_id=$3,creator_rank_id=$4
+	set name = $1,bio = $2, avatar_image_id = $3, creator_rank_id = $4, is_nsfw = $7
 	where id = $5 and user_id = $6
-	`, c.Name, c.Bio, c.AvatarImageID, c.CreatorRankID, c.ID, c.UserID)
+	`, c.Name, c.Bio, c.AvatarImageID, c.CreatorRankID, c.ID, c.UserID, c.IsNSFW,
+	)
 
 	if err != nil {
 		trans.Rollback(context.Background())

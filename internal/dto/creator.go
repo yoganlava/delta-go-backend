@@ -4,6 +4,7 @@ type CreateCreatorDTO struct {
 	Name          string  `json:"name" binding:""`
 	Bio           *string `json:"bio"`
 	AvatarImageID *int    `json:"avatar_image_id"`
+	IsNSFW        bool    `json:"is_nsfw"`
 	UserID        int     `json:"user_id"`
 }
 
@@ -13,6 +14,7 @@ type UpdateCreatorDTO struct {
 	Bio           *string `json:"bio"`
 	AvatarImageID *int    `json:"avatar_image_id"`
 	CreatorRankID int     `json:"creator_rank_id"`
+	IsNSFW        bool    `json:"is_nsfw"`
 	UserID        int     `json:"user_id"`
 }
 

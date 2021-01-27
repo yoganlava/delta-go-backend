@@ -11,6 +11,7 @@ require (
 	github.com/jackc/pgx/v4 v4.10.0
 	github.com/joho/godotenv v1.3.0
 	github.com/plutov/paypal v2.0.5+incompatible
+	github.com/plutov/paypal/v4 v4.0.0 // indirect
 	github.com/stripe/stripe-go v70.15.0+incompatible
 	github.com/stripe/stripe-go/v72 v72.28.0
 	github.com/vmihailenco/msgpack/v5 v5.1.3

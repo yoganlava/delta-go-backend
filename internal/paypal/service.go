@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/plutov/paypal"
+	"github.com/plutov/paypal/v4"
 )
 
 type IPaypalService interface {
@@ -30,18 +30,30 @@ func New() PaypalService {
 
 func (ps PaypalService) CreatePaypalPayout(createPaypalPayoutDTO dto.CreatePaypalPayoutDTO) error {
 	var payout_method_id int
-	err := ps.pool.QueryRow(context.Background(), `insert into payout_method (full_name, created_at, updated_at, creator_id, default_method) values ($1, now(), now(), $2, $3) returning id`, createPaypalPayoutDTO.FullName, createPaypalPayoutDTO.CreatorID, createPaypalPayoutDTO.DefaultMethod).Scan(&payout_method_id)
+	err := ps.pool.QueryRow(context.Background(), `
+	insert into payout_method
+	(full_name, created_at, updated_at, creator_id, default_method)
+	values
+	($1, now(), now(), $2, $3) returning id`,
+		createPaypalPayoutDTO.FullName, createPaypalPayoutDTO.CreatorID, createPaypalPayoutDTO.DefaultMethod,
+	).Scan(&payout_method_id)
 	if err != nil {
 		return nil
 	}
-	_, err = ps.pool.Exec(context.Background(), `insert into paypal_payout_method (payout_method_id, paypal_email) values ($1, $2)`, payout_method_id, createPaypalPayoutDTO.PaypalEmail)
+	_, err = ps.pool.Exec(context.Background(), `
+	insert into paypal_payout_method
+	(payout_method_id, paypal_email)
+	values
+	($1, $2)`,
+		payout_method_id, createPaypalPayoutDTO.PaypalEmail,
+	)
 
 	return nil
 }
 
 func (ps PaypalService) CreatePaypalOrder(createDonationPaypalDTO dto.CreateDonationPaypalOrderDTO) (*paypal.Order, error) {
-	return ps.client.CreateOrder("CAPTURE", []paypal.PurchaseUnitRequest{
-		paypal.PurchaseUnitRequest{
+	return ps.client.CreateOrder(context.Background(), "CAPTURE", []paypal.PurchaseUnitRequest{
+		{
 			Amount: &paypal.PurchaseUnitAmount{
 				Value:    createDonationPaypalDTO.Amount,
 				Currency: createDonationPaypalDTO.Currency,
@@ -61,7 +73,6 @@ func (ps PaypalService) CreatePaypalOrder(createDonationPaypalDTO dto.CreateDona
 		&paypal.ApplicationContext{
 			BrandName:          "",
 			Locale:             "",
-			LandingPage:        "",
 			ShippingPreference: "",
 			UserAction:         "",
 			ReturnURL:          "http://onjin.jp",
@@ -70,6 +81,8 @@ func (ps PaypalService) CreatePaypalOrder(createDonationPaypalDTO dto.CreateDona
 	)
 }
 
-func (ps PaypalService) HandleWebhook() {
-
+func (ps PaypalService) HandleWebhook(webhook paypal.Webhook) {
+	for _, event := range webhook.EventTypes {
+		println(event)
+	}
 }
