@@ -8,3 +8,8 @@ type FetchProjectPostsDTO struct {
 	Type      string `form:"type"`
 	Mature    int    `form:"mature"`
 }
+
+type DeleteProjectPostDTO struct {
+	PostID int `json:"post_id"`
+	UserID int
+}

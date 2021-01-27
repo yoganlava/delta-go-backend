@@ -2,7 +2,9 @@ package posts
 
 import (
 	"context"
+	"errors"
 	"main/db"
+	"main/internal/dto"
 	"main/internal/entity"
 
 	"github.com/georgysavva/scany/pgxscan"
@@ -31,4 +33,26 @@ func (ps PostService) FetchProjectPosts(creatorID int) ([]*entity.Post, error) {
 		creatorID,
 	)
 	return p, err
+}
+
+func (ps PostService) DeleteProjectPost(deleteProjectPostDTO dto.DeleteProjectPostDTO) error {
+	var creatorID int
+	err := ps.pool.QueryRow(context.Background(), `
+	select
+	id as creatorID
+	from creator
+	where user_id = $1
+	`,
+		deleteProjectPostDTO.UserID,
+	).Scan(&creatorID)
+	if err != nil {
+		return errors.New("全く許可しません")
+	}
+	_, err = ps.pool.Exec(context.Background(), `
+	delete from post
+	where id = $1
+	`,
+		creatorID,
+	)
+	return err
 }
