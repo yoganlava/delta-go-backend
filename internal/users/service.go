@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"main/db"
 	"main/internal/auth"
+	"main/internal/dto"
 	"main/internal/email"
 	"main/internal/entity"
 
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // IUserService encapsulates logic
@@ -71,5 +73,21 @@ func (us UserService) SendResetPasswordEmail(username string) error {
 	`,
 		username, token.JWT))
 
+	return err
+}
+
+func (us UserService) ResetPassword(resetPasswordDTO dto.ResetPasswordDTO) error {
+	userID, err := auth.VerifyToken(resetPasswordDTO.Token)
+	hashedPass, err := bcrypt.GenerateFromPassword([]byte(resetPasswordDTO.Password), 10)
+	if err != nil {
+		return err
+	}
+	_, err = us.pool.Exec(context.Background(), `
+	update users
+	set password = $2
+	where id = $1
+	`,
+		userID, hashedPass,
+	)
 	return err
 }
