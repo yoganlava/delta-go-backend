@@ -22,7 +22,8 @@ CREATE TYPE post_type AS ENUM (
 
 CREATE TYPE goal_type AS ENUM (
   'subscription_count',
-  'money'
+  'money',
+  'donation_count'
 );
 
 CREATE TYPE benefit_period AS ENUM (
