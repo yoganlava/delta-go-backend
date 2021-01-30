@@ -24,4 +24,4 @@ INSERT INTO category (banner, name, description, created_at, updated_at)
   VALUES ('', '音楽', '音楽・歌関連のものを作ってる', now(), now()), ('', '絵', '音楽・歌関連のものを作ってる', now(), now());
 
 INSERT into project (name,page_url,description, banner, creator_id,category_id,setting,created_at,updated_at) 
-values('オンジン','onijn','オンジン公式プロジェクトページ、オンジン株式会社ではonjin.jpにおける管理！','/file/default_banner.png',1,1,{"show_total_earning": true},now(),now());
+values('オンジン','onjin','オンジン公式プロジェクトページ、オンジン株式会社ではonjin.jpにおける管理！','/file/default_banner.png',1,1,'{"show_total_earning": true}',now(),now());
