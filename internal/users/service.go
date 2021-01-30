@@ -59,7 +59,7 @@ func (us UserService) SendResetPasswordEmail(username string) error {
 	var userEmail string
 	var userID int
 	err := us.pool.QueryRow(context.Background(), `
-	select email as userEmail, id as userID from user where username=$1
+	select email as userEmail, id as userID from userwhere username=$1
 	`,
 		username,
 	).Scan(&userEmail, &userID)

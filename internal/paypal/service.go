@@ -81,8 +81,6 @@ func (ps PaypalService) CreatePaypalOrder(createDonationPaypalDTO dto.CreateDona
 	)
 }
 
-func (ps PaypalService) HandleWebhook(webhook paypal.Webhook) {
-	for _, event := range webhook.EventTypes {
-		println(event)
-	}
+func (ps PaypalService) HandleWebhook(webhook paypal.WebhookEvent) {
+
 }
