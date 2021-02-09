@@ -44,7 +44,10 @@ func (ss StripeService) CreateStripeAccount(email string, CreatorID int) (*strip
 	if err != nil {
 		return &stripe.Account{}, err
 	}
-	_, err = ss.pool.Exec(context.Background(), "update creator set stripe_account_id=$1 where id=$2", acc.ID, CreatorID)
+	_, err = ss.pool.Exec(context.Background(), `
+	update creator
+	set stripe_account_id=$1
+	where id=$2`, acc.ID, CreatorID)
 	return acc, err
 }
 
@@ -69,7 +72,12 @@ func (ss StripeService) CreatePaymentIntent(donationDTO dto.DonationDTO) (*strip
 		ApplicationFeeAmount: stripe.Int64(0),
 	}
 	var account_id string
-	err := ss.pool.QueryRow(context.Background(), `select creator.stripe_account_id from creator inner join project on creator.id=(select creator_id from project where id=$1)`, donationDTO.ReceiverProjectID).Scan(&account_id)
+	err := ss.pool.QueryRow(context.Background(), `
+	select creator.stripe_account_id
+	from creator
+	inner join
+	project on
+	creator.id=(select creator_id from project where id=$1)`, donationDTO.ReceiverProjectID).Scan(&account_id)
 	if err != nil {
 		return nil, err
 	}

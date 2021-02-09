@@ -9,11 +9,11 @@ import (
 )
 
 type controller struct {
-	service UserService
+	service *UserService
 }
 
 // RegisterRoutes register routes
-func RegisterRoutes(router *gin.Engine, service UserService) {
+func RegisterRoutes(router *gin.Engine, service *UserService) {
 	c := controller{service}
 	u := router.Group("/users")
 	u.Use(middleware.JwtMiddleware())

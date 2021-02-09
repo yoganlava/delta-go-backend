@@ -9,10 +9,10 @@ import (
 )
 
 type controller struct {
-	service ProjectService
+	service *ProjectService
 }
 
-func RegisterRoutes(router *gin.Engine, service ProjectService) {
+func RegisterRoutes(router *gin.Engine, service *ProjectService) {
 	c := controller{service}
 	r := router.Group("/projects")
 	r.Use(middleware.OptionalMiddleware())

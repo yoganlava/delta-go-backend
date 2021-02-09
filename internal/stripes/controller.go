@@ -9,10 +9,10 @@ import (
 )
 
 type controller struct {
-	service StripeService
+	service *StripeService
 }
 
-func RegisterRoutes(router *gin.Engine, service StripeService) {
+func RegisterRoutes(router *gin.Engine, service *StripeService, services ...interface{}) {
 	c := controller{service}
 	s := router.Group("/stripes")
 	s.POST("/webhook", c.HandleStripeWebhook)
