@@ -12,7 +12,7 @@ type controller struct {
 	service *StripeService
 }
 
-func RegisterRoutes(router *gin.Engine, service *StripeService, services ...interface{}) {
+func RegisterRoutes(router *gin.Engine, service *StripeService) {
 	c := controller{service}
 	s := router.Group("/stripes")
 	s.POST("/webhook", c.HandleStripeWebhook)

@@ -24,8 +24,7 @@ func main() {
 	postsService := posts.New()
 	projectsService := projects.New()
 	usersService := users.New()
-	stripes.RegisterRoutes(router, &stripeService, &creatorsService, &postsService)
-	return
+	stripes.RegisterRoutes(router, &stripeService)
 	auth.RegisterRoutes(router, authService)
 	creators.RegisterRoutes(router, &creatorsService)
 	posts.RegisterRoutes(router, &postsService)
