@@ -1,77 +1,77 @@
 -- drop table if exists album;
-DROP TABLE IF EXISTS payout_transaction;
+DROP TABLE IF EXISTS payout_transactions;
 
-DROP TABLE IF EXISTS subscription_transaction;
+DROP TABLE IF EXISTS subscription_transactions;
 
-DROP TABLE IF EXISTS donation_transaction;
+DROP TABLE IF EXISTS donation_transactions;
 
-DROP TABLE IF EXISTS user_profile;
+DROP TABLE IF EXISTS user_profiles;
 
-DROP TABLE IF EXISTS post_vote;
+DROP TABLE IF EXISTS post_votes;
 
-DROP TABLE IF EXISTS post_text;
+DROP TABLE IF EXISTS post_texts;
 
-DROP TABLE IF EXISTS post_tag;
+DROP TABLE IF EXISTS post_tags;
 
-DROP TABLE IF EXISTS post_poll_answer;
+DROP TABLE IF EXISTS post_poll_answers;
 
-DROP TABLE IF EXISTS post_poll_option;
+DROP TABLE IF EXISTS post_poll_options;
 
-DROP TABLE IF EXISTS post_file;
+DROP TABLE IF EXISTS post_files;
 
-DROP TABLE IF EXISTS post_link;
+DROP TABLE IF EXISTS post_links;
 
-DROP TABLE IF EXISTS stripe_card_payment_method;
+DROP TABLE IF EXISTS stripe_card_payment_methods;
 
-DROP TABLE IF EXISTS stripe_bank_payment_method;
+DROP TABLE IF EXISTS stripe_bank_payment_methods;
 
-DROP TABLE IF EXISTS tier_benefit;
+DROP TABLE IF EXISTS tier_benefits;
 
-DROP TABLE IF EXISTS comment_vote;
+DROP TABLE IF EXISTS comment_votes;
 
-DROP TABLE IF EXISTS creator_access;
+DROP TABLE IF EXISTS creator_accesses;
 
-DROP TABLE IF EXISTS tag;
+DROP TABLE IF EXISTS tags;
 
-DROP TABLE IF EXISTS creator_rank;
+DROP TABLE IF EXISTS creator_ranks;
 
-DROP TABLE IF EXISTS payout_method;
+DROP TABLE IF EXISTS payout_methods;
 
-DROP TABLE IF EXISTS payment_method;
+DROP TABLE IF EXISTS payment_methods;
 
-DROP TABLE IF EXISTS benefit;
+DROP TABLE IF EXISTS benefits;
 
-DROP TABLE IF EXISTS goal;
+DROP TABLE IF EXISTS goals;
 
-DROP TABLE IF EXISTS file CASCADE;
+DROP TABLE IF EXISTS files CASCADE;
 
-DROP TABLE IF EXISTS TRANSACTION;
+DROP TABLE IF EXISTS TRANSACTIONs;
 
-DROP TABLE IF EXISTS subscription;
+DROP TABLE IF EXISTS subscriptions;
 
-DROP TABLE IF EXISTS comment;
+DROP TABLE IF EXISTS comments;
 
-DROP TABLE IF EXISTS post;
+DROP TABLE IF EXISTS posts;
 
-DROP TABLE IF EXISTS access;
+DROP TABLE IF EXISTS accesses;
 
-DROP TABLE IF EXISTS project;
+DROP TABLE IF EXISTS projects;
 
-DROP TABLE IF EXISTS category CASCADE;
+DROP TABLE IF EXISTS categorys CASCADE;
 
-DROP TABLE IF EXISTS creator;
+DROP TABLE IF EXISTS creators;
 
 DROP TABLE IF EXISTS users;
 
-DROP TYPE IF EXISTS gender_type;
+DROP TYPE IF EXISTS gender_types;
 
-DROP TYPE IF EXISTS login_strategy;
+DROP TYPE IF EXISTS login_strategys;
 
-DROP TYPE IF EXISTS post_type;
+DROP TYPE IF EXISTS post_types;
 
-DROP TYPE IF EXISTS goal_type;
+DROP TYPE IF EXISTS goal_types;
 
-DROP TYPE IF EXISTS benefit_period;
+DROP TYPE IF EXISTS benefit_periods;
 
-DROP TYPE IF EXISTS card_brand_type;
+DROP TYPE IF EXISTS card_brand_types;
 

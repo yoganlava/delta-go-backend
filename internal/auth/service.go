@@ -104,7 +104,7 @@ func (auth AuthService) HandleGoogleAuthentication(tokenString string) (entity.A
 	u.id,u.username,u.password,u.email,u.created_at,u.gender,u.verified,
 	f.location as avatar
 	from users u
-	inner join file f on f.id = u.avatar_image_id
+	inner join files f on f.id = u.avatar_image_id
 	where u.social_id = $1`, tokenInfo.UserId)
 	if err != nil {
 		return entity.AuthUser{}, err
@@ -122,12 +122,9 @@ func (auth AuthService) HandleGoogleAuthentication(tokenString string) (entity.A
 	}
 
 	err = pgxscan.Get(context.Background(), auth.pool, &u, `
-	insert into users
-	(email, username, verified, created_at, updated_at, strategy, avatar) 
-	values
-	($1, $2, true, now(), now(), 'google', 'https://img.jpmtl.com/default_profile.png')
-	returning
-	id, email, username, verified, created_at, avatar`,
+	insert into users (email, username, verified, created_at, updated_at, strategy, avatar) 
+		values($1, $2, true, now(), now(), 'google', 'https://img.jpmtl.com/default_profile.png')
+	returning id, email, username, verified, created_at, avatar`,
 		tokenInfo.Email, tokenInfo.Email,
 	)
 
@@ -149,7 +146,10 @@ func (auth AuthService) Register(request dto.AuthRegister) (entity.User, error) 
 	if user.ID > 0 {
 		return entity.User{}, errors.New("ユーザー名またはEメールがもう使われています")
 	}
-	err = pgxscan.Get(context.Background(), auth.pool, &user, "insert into users (email,username, password,verified,created_at,updated_at,strategy,avatar) VALUES ($1, $2,$3,$4,now(),now(),'local','https://img.jpmtl.com/default_profile.png') returning id,username,password,verified,created_at,avatar",
+	err = pgxscan.Get(context.Background(), auth.pool, &user,
+		`insert into users (email,username, password,verified,created_at,updated_at,strategy,avatar) 
+	VALUES ($1, $2,$3,$4,now(),now(),'local','/file/default_profile.png') 
+	returning id, email, username, verified, created_at, avatar`,
 		request.Email, request.Username, string(hashed), false)
 
 	if err != nil {
@@ -168,13 +168,11 @@ func (auth AuthService) Register(request dto.AuthRegister) (entity.User, error) 
 //Login user
 func (auth AuthService) Login(request dto.AuthLogin) (entity.AuthUser, error) {
 	var u = entity.AuthUser{}
+	fmt.Print(request.Credential)
 	// err:= us.pool.QueryRow(context.Background(),).Scan(&u.Id,&u.Password,&u.Username,&u.)
 	err := pgxscan.Get(context.Background(), auth.pool, &u, `
-	select 
-	u.id,u.username,u.password,u.email,u.created_at,u.gender,u.verified,
-	f.location as avatar
+	select u.id,u.username,u.password,u.email,u.created_at,u.gender,u.verified,u.avatar
 	from users u
-	inner join file f on f.id = u.avatar_image_id
 	where u.username = $1 or u.email = $1`, request.Credential)
 	hashedError := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(request.Password))
 	if u.ID == 0 {

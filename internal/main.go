@@ -8,7 +8,6 @@ import (
 	"main/internal/stripes"
 	"main/internal/users"
 	"os"
-
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/stripe/stripe-go/v72"

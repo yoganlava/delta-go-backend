@@ -29,6 +29,7 @@ func (con controller) register(c *gin.Context) {
 	}
 
 	user, err := con.service.Register(request)
+	fmt.Print(err)
 	if err != nil {
 		return
 	}
@@ -50,6 +51,7 @@ func (con controller) login(c *gin.Context) {
 	if err != nil {
 		return
 	} else if user.ID == 0 {
+		fmt.Print(user)
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "ユーザー名・Eメールとパスワードの組み合わせのアカウントが見つかりませんでした",
 		})
